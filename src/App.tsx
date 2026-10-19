@@ -1,9 +1,15 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { AnimatePresence } from 'motion/react'
 import type { Session } from '@supabase/supabase-js'
-import { CalendarBlank, CookingPot, Heart, PencilSimpleLine, SunHorizon, Timer } from '@phosphor-icons/react'
+import { CalendarBlank, CookingPot, Heart, SunHorizon, Timer } from '@phosphor-icons/react'
 import { Today } from './screens/Today'
-import { useTasks } from './lib/data'
+import { Week } from './screens/Week'
+import { QuickAdd } from './components/QuickAdd'
+import { EventSheet, type EventDraft } from './components/EventSheet'
+import { useEvents, useTasks } from './lib/data'
+import { guessArea, type CalEvent } from './lib/calendar'
 import { importLocalData } from './lib/importLocal'
+import { saveTimezone } from './lib/push'
 import { Blank } from './screens/Blank'
 import { Me, type PageMode } from './screens/Me'
 import { Login } from './screens/Login'
@@ -13,6 +19,20 @@ import { isBedtime, useNow } from './lib/time'
 import { play } from './lib/feel'
 
 type Tab = 'today' | 'week' | 'timer' | 'meals' | 'me'
+
+const BLANK_EVENT: EventDraft = {
+  title: '',
+  starts_at: new Date().toISOString(),
+  ends_at: null,
+  all_day: false,
+  area: 'other',
+  location: null,
+  notes: null,
+  repeat_days: null,
+  repeat_until: null,
+  remind_day_before: true,
+  remind_hour_before: true,
+}
 
 const TABS: { id: Tab; label: string; Icon: typeof SunHorizon; colour: string }[] = [
   { id: 'today', label: 'Today', Icon: SunHorizon, colour: '#FFF1A8' },
@@ -62,10 +82,20 @@ export default function App() {
 function Planner({ session, pageMode, setPageMode }: { session: Session; pageMode: PageMode; setPageMode: (m: PageMode) => void }) {
   const [tab, setTab] = useState<Tab>('today')
   const tasks = useTasks()
+  const cal = useEvents()
+  const [sheet, setSheet] = useState<{ id?: string; draft: EventDraft } | null>(null)
+
+  const openEvent = (e: CalEvent) => { setSheet({ id: e.id, draft: e }); play('page') }
+  const newEventOn = (day: Date) => {
+    const start = new Date(day)
+    start.setHours(18, 0, 0, 0)
+    setSheet({ draft: { ...BLANK_EVENT, starts_at: start.toISOString() } })
+    play('page')
+  }
   const scrollRef = useRef<HTMLElement>(null)
 
   // Bring over anything this device saved before Phase 1, once.
-  useEffect(() => { importLocalData(session.user.id) }, [session.user.id])
+  useEffect(() => { importLocalData(session.user.id); saveTimezone(session.user.id) }, [session.user.id])
 
   // A failed save shows a short note for a few seconds.
   const [syncError, setSyncError] = useState(false)
@@ -79,8 +109,8 @@ function Planner({ session, pageMode, setPageMode }: { session: Session; pageMod
   return (
     <>
       <main className="sheet-scroll" ref={scrollRef}>
-        {tab === 'today' && <Today userId={session.user.id} tasks={tasks} />}
-        {tab === 'week' && <Blank title="Week" phase="Phase 2" note="Your calendar will live here, with reminders the day before and on the day." />}
+        {tab === 'today' && <Today userId={session.user.id} tasks={tasks} events={cal.events} onOpen={openEvent} />}
+        {tab === 'week' && <Week events={cal.events} onOpen={openEvent} onAddOn={newEventOn} />}
         {tab === 'timer' && <Blank title="Timer" phase="Phase 3" note="Projects, weekly hours and the export for work. For now the sticky note on Today keeps time." />}
         {tab === 'meals' && <Blank title="Meals" phase="Phase 4" note="Recipes, the weekly meal grid and a shopping list that writes itself." />}
         {tab === 'me' && <Me email={session.user.email ?? null} pageMode={pageMode} setPageMode={setPageMode} />}
@@ -88,7 +118,37 @@ function Planner({ session, pageMode, setPageMode }: { session: Session; pageMod
       {syncError && (
         <p className="sync-note" role="alert">That didn’t save. Check your signal and try again.</p>
       )}
-      {tab === 'today' && <QuickAdd onAdd={title => tasks.add(title)} />}
+      {(tab === 'today' || tab === 'week') && (
+        <QuickAdd
+          onTask={title => tasks.add(title)}
+          onEvent={p => cal.add({
+            ...BLANK_EVENT,
+            title: p.title,
+            starts_at: p.start.toISOString(),
+            ends_at: p.end?.toISOString() ?? null,
+            all_day: p.allDay,
+            area: p.area,
+            repeat_days: p.repeatDays,
+          })}
+        />
+      )}
+      <AnimatePresence>
+        {sheet && (
+          <EventSheet
+            key={sheet.id ?? 'new'}
+            initial={sheet.draft}
+            isNew={!sheet.id}
+            onClose={() => setSheet(null)}
+            onDelete={sheet.id ? () => { cal.remove(sheet.id!); setSheet(null); play('pop') } : undefined}
+            onSave={draft => {
+              if (sheet.id) cal.update(sheet.id, draft)
+              else cal.add({ ...draft, area: draft.area === 'other' ? guessArea(draft.title) : draft.area })
+              setSheet(null)
+              play('stamp')
+            }}
+          />
+        )}
+      </AnimatePresence>
       <nav className="tabs" aria-label="Sections">
         {TABS.map(({ id, label, Icon, colour }) => (
           <button
@@ -105,32 +165,5 @@ function Planner({ session, pageMode, setPageMode }: { session: Session; pageMod
         ))}
       </nav>
     </>
-  )
-}
-
-function QuickAdd({ onAdd }: { onAdd: (title: string) => void }) {
-  const [text, setText] = useState('')
-  function submit(e: FormEvent) {
-    e.preventDefault()
-    const title = text.trim()
-    if (!title) return
-    onAdd(title)
-    setText('')
-    play('pop')
-  }
-  return (
-    <form className="quick" onSubmit={submit}>
-      <label>
-        <PencilSimpleLine aria-hidden="true" />
-        <span className="sr-only">Add something</span>
-        <input
-          value={text}
-          onChange={e => setText(e.target.value)}
-          placeholder="Jot it down…"
-          enterKeyHint="done"
-          autoComplete="off"
-        />
-      </label>
-    </form>
   )
 }

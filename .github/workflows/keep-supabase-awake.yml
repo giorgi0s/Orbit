@@ -1,0 +1,16 @@
+# Free Supabase projects pause after 7 days without activity, which would stop reminders.
+# This pokes the database once a day so Orbit stays awake while you're away.
+name: Keep Supabase awake
+on:
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase
+        run: |
+          curl -fsS -o /dev/null -w "%{http_code}\n" \
+            -H "apikey: sb_publishable_e-Xjb1_KyUXQA3VTh-OQ4A_ud-54hAo" \
+            "https://wgdotafwiblsgnkhppdo.supabase.co/rest/v1/goals?select=id&limit=1"

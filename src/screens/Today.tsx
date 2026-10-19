@@ -3,11 +3,13 @@ import { AnimatePresence } from 'motion/react'
 import { Play, Stop } from '@phosphor-icons/react'
 import { Bean, PenBox, Squiggle } from '../components/Doodles'
 import { Sticker } from '../components/Sticker'
+import { Schedule } from '../components/Schedule'
 import { useGoals, useTimer, type Goal, type useTasks } from '../lib/data'
+import { addDays, occurrencesBetween, startOfDay, timeLabel, type CalEvent, type Occurrence } from '../lib/calendar'
 import { clock, duration, isBedtime, useNow, weekKey } from '../lib/time'
 import { play, tap } from '../lib/feel'
 
-function beanLines(now: Date, left: number): string[] {
+function beanLines(now: Date, left: number, next?: Occurrence): string[] {
   const things = left === 0 ? 'Nothing left on the list' : left === 1 ? 'One thing left on the list' : `${left} things left on the list`
   const h = now.getHours()
   if (isBedtime(now)) return [
@@ -17,19 +19,23 @@ function beanLines(now: Date, left: number): string[] {
   ]
   const hello = h < 12 ? 'Morning!' : h < 17 ? 'Afternoon!' : 'Evening!'
   return [
-    `${hello} ${things}. One at a time.`,
+    `${hello} ${things}.${next ? ` Next up: ${next.event.title} at ${timeLabel(next.start)}.` : ' One at a time.'}`,
     'Small reminder that water exists and you are allowed to drink it.',
     'Been outside today? Even a lap of the block counts.',
     'Anything rattling around your head? Jot it down at the bottom.',
   ]
 }
 
-export function Today({ userId, tasks: taskList }: { userId: string; tasks: ReturnType<typeof useTasks> }) {
+export function Today({ userId, tasks: taskList, events, onOpen }: {
+  userId: string
+  tasks: ReturnType<typeof useTasks>
+  events: CalEvent[]
+  onOpen: (e: CalEvent) => void
+}) {
   const now = useNow()
   const bedtime = isBedtime(now)
   const { tasks } = taskList
   const left = tasks.filter(t => !t.done).length
-  const lines = beanLines(now, left)
   const [lineIdx, setLineIdx] = useState(0)
 
   const week = weekKey(now)
@@ -47,6 +53,8 @@ export function Today({ userId, tasks: taskList }: { userId: string; tasks: Retu
     return sum + Math.max(0, new Date(e.ended_at).getTime() - start) / 1000
   }, 0)
   const lastEntry = timer.entries.at(-1)
+  const todays = occurrencesBetween(events, startOfDay(now), addDays(startOfDay(now), 1))
+  const lines = beanLines(now, left, todays.find(o => !o.event.all_day && o.start > now))
 
   function toggleTimer() {
     tap()
@@ -117,7 +125,7 @@ export function Today({ userId, tasks: taskList }: { userId: string; tasks: Retu
       </section>
 
       <h2 className="page-h">Today <Squiggle width={78} /></h2>
-      <p className="empty">Nothing on the calendar yet. The calendar moves in during Phase 2.</p>
+      {todays.length ? <Schedule items={todays} now={now} onOpen={onOpen} /> : <p className="empty">Nothing booked today. Jot something like ‘gym 6pm’ at the bottom.</p>}
 
       <h2 className="page-h">To do <Squiggle width={70} /></h2>
       {tasks.length === 0 ? (

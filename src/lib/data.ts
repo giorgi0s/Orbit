@@ -1,6 +1,7 @@
 import { supabase } from './supabase'
 import { save, useLive } from './live'
 import type { StickerKind } from '../components/Sticker'
+import type { CalEvent } from './calendar'
 
 export type Task = { id: string; title: string; done: boolean; done_at: string | null; created_at: string }
 export type Goal = { id: string; slug: string; title: string; target: number; sticker: StickerKind; sort: number; archived: boolean }
@@ -74,5 +75,21 @@ export function useTimer(userId: string, todayStartIso: string) {
       await save(entries, rows => [...rows, entry], () => db().from('time_entries').insert(entry))
       await write({ started_at: null })
     },
+  }
+}
+
+export function useEvents() {
+  const live = useLive<CalEvent>('events', { order: 'starts_at' })
+
+  return {
+    events: live.rows,
+    add: (event: Omit<CalEvent, 'id' | 'created_at'>) => {
+      const row: CalEvent = { ...event, id: crypto.randomUUID(), created_at: new Date().toISOString() }
+      return save(live, rows => [...rows, row], () => db().from('events').insert(row))
+    },
+    update: (id: string, patch: Partial<CalEvent>) =>
+      save(live, rows => rows.map(e => (e.id === id ? { ...e, ...patch } : e)), () => db().from('events').update(patch).eq('id', id)),
+    remove: (id: string) =>
+      save(live, rows => rows.filter(e => e.id !== id), () => db().from('events').delete().eq('id', id)),
   }
 }

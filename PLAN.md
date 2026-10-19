@@ -154,11 +154,11 @@ Every table has `user_id` and Row Level Security (only I can read my rows). ✅ 
 
 | Table | Key fields |
 |---|---|
-| `settings` | timezone, default reminder times, mascot name, theme |
+| `settings` ✅ | timezone (more later: mascot name, theme) |
 | `areas` | name, emoji, colour (Work, Body, Food, Home, Out, Mind…) |
-| `events` | title, area_id, start_at, end_at, all_day, location, notes, rrule (repeats), reminder_offsets |
-| `reminders` | event_id / task_id, fire_at, title, body, sent_at |
-| `push_subscriptions` | endpoint, keys, device_label |
+| `events` ✅ | title, starts_at, ends_at, all_day, area, location, notes, repeat_days + repeat_until (weekly repeats), remind_day_before, remind_hour_before |
+| `sent_notifications` ✅ | what the reminder sender already sent (no duplicates) |
+| `push_subscriptions` ✅ | endpoint, keys, device |
 | `tasks` ✅ | title, done, done_at (later: area_id, bucket weekday/weekend/someday, due_date, rolled_over_count) |
 | `goals` ✅ | slug, title, target, sticker, sort, archived |
 | `goal_stamps` ✅ | goal_id, week_start, count (stickers per goal per week) |
@@ -191,7 +191,7 @@ Each phase ends with something usable on the phone.
 |---|---|---|
 | **0. Skeleton** ✅ | Vite + React + Tailwind + PWA, Supabase project + login, deploy to Vercel | "Hello Orbit" opens from the iPhone home screen and the Mac Dock |
 | **1. Core loop** 🟡 sync done | Today screen, tasks (weekday/weekend/someday), weekly goals, the satisfying tick | I can plan a week and tick things off |
-| **2. Calendar + reminders** | Week/month view, quick add, repeating events, the full push pipeline | I get a "tomorrow" notification on my phone |
+| **2. Calendar + reminders** ✅ | Week/month view, quick add, repeating events, the full push pipeline | I get a "tomorrow" notification on my phone |
 | **3. Work timer** | Projects, start/stop across devices, edit entries, reports, CSV/copy export | I log a real work day and export it |
 | **4. Meal prep** | Recipes, meal grid, shopping list, fridge tracker | I plan a week of meals and shop from the list |
 | **5. Weekly Reset + life stuff** | Sunday ritual, gym streak, Touch Grass plant, Bored? wheel, daily briefs | I do a full Sunday reset in Orbit |
