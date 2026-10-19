@@ -1,0 +1,1332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Orbit Vibes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600&family=M+PLUS+Rounded+1c:wght@500;700;800&family=Shantell+Sans:ital,wght,BNCE,INFM@0,400..700,0..100,0..100;1,400..700,0..100,0..100&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.2/src/regular/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.2/src/bold/style.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.2/src/fill/style.css">
+<style>
+/* ───────────────────────── shell (the page around the phones) ───────────────────────── */
+:root {
+  --shell-bg: #E6E8EE;
+  --shell-ink: #191B22;
+  --shell-soft: #565B6B;
+  --shell-line: #CDD1DB;
+  --shell-card: #F4F5F8;
+  --shell-accent: #3D4BD6;
+  color-scheme: light;
+}
+body[data-mode="night"] {
+  --shell-bg: #101218;
+  --shell-ink: #ECEEF5;
+  --shell-soft: #A2A8BA;
+  --shell-line: #2A2E3A;
+  --shell-card: #181B23;
+  --shell-accent: #9AA4FF;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--shell-bg);
+  color: var(--shell-ink);
+  font: 15px/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  transition: background-color .5s cubic-bezier(.2,.8,.2,1), color .5s;
+}
+::selection { background: var(--shell-accent); color: var(--shell-bg); }
+:focus-visible { outline: 2px solid var(--shell-accent); outline-offset: 3px; }
+button { font: inherit; color: inherit; }
+
+.shell-head {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 40px 24px 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 40px;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.shell-head h1 {
+  margin: 0 0 6px;
+  font-size: clamp(26px, 4vw, 36px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.shell-head p { margin: 0; color: var(--shell-soft); max-width: 60ch; text-wrap: pretty; }
+.shell-controls { display: flex; gap: 10px; flex-wrap: wrap; }
+.seg {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--shell-card);
+  border: 1px solid var(--shell-line);
+}
+.seg button {
+  border: 0;
+  background: transparent;
+  padding: 7px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--shell-soft);
+  transition: background-color .25s, color .25s;
+}
+.seg button[aria-pressed="true"] { background: var(--shell-ink); color: var(--shell-bg); }
+.seg button i { font-size: 16px; }
+
+.picker { display: none; margin: 18px 24px 0; }
+.lineup {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 28px 24px 40px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  align-items: start;
+}
+.option { display: flex; flex-direction: column; align-items: center; gap: 22px; min-width: 0; }
+.about { width: 100%; max-width: 410px; }
+.about h2 { margin: 0 0 4px; font-size: 22px; letter-spacing: -0.01em; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pick-tag {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--shell-ink);
+  color: var(--shell-bg);
+  letter-spacing: 0;
+}
+.about .thesis { margin: 0 0 12px; color: var(--shell-soft); text-wrap: pretty; }
+.chips { display: flex; gap: 6px; margin: 0 0 14px; }
+.chips span {
+  width: 26px; height: 26px; border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.12);
+}
+.about dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: 14px; }
+.about dt { font-weight: 600; }
+.about dd { margin: 0; color: var(--shell-soft); }
+.about .raises { margin: 12px 0 0; padding: 12px 0 0; border-top: 1px solid var(--shell-line); font-size: 13px; color: var(--shell-soft); }
+.about .raises p { margin: 0 0 4px; }
+.about .raises b { color: var(--shell-ink); font-weight: 600; }
+
+.shell-foot {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 8px 24px 56px;
+  color: var(--shell-soft);
+  font-size: 13px;
+}
+.shell-foot h3 { font-size: 14px; color: var(--shell-ink); margin: 0 0 8px; }
+.shell-foot ul { margin: 0 0 16px; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 6px 24px; }
+.shell-foot li b { color: var(--shell-ink); font-weight: 600; }
+
+@media (max-width: 1279px) {
+  .picker { display: flex; justify-content: center; }
+  .lineup { grid-template-columns: 1fr; max-width: 900px; }
+  .option { display: none; flex-direction: row; justify-content: center; align-items: flex-start; }
+  .option.is-shown { display: flex; }
+}
+@media (max-width: 760px) {
+  .shell-head { padding: 24px 16px 4px; }
+  .picker { margin: 14px 16px 0; }
+  .lineup { padding: 20px 16px 32px; }
+  .option.is-shown { flex-direction: column; align-items: center; }
+  .shell-foot { padding: 8px 16px 40px; }
+}
+
+/* ───────────────────────── phone frame ───────────────────────── */
+.phone {
+  --z: 1;
+  zoom: var(--z);
+  width: 410px;
+  height: 864px;
+  padding: 10px;
+  border-radius: 64px;
+  background: #0E0F13;
+  box-shadow: 0 30px 60px -20px rgba(20,22,40,.45), 0 0 0 2px #2A2C33 inset;
+  flex: none;
+  position: relative;
+}
+.screen {
+  position: relative;
+  width: 390px;
+  height: 844px;
+  border-radius: 54px;
+  overflow: hidden;
+  isolation: isolate;
+}
+.island-notch {
+  position: absolute; z-index: 50;
+  top: 11px; left: 50%; transform: translateX(-50%);
+  width: 122px; height: 35px; border-radius: 20px; background: #000;
+}
+.scroll {
+  position: absolute; inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+.scroll::-webkit-scrollbar { display: none; }
+.statusbar {
+  position: relative; z-index: 5;
+  height: 54px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 6px 30px 0 40px;
+  font: 600 16px/1 -apple-system, "SF Pro Text", system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+.statusbar .sb-icons { display: flex; gap: 6px; align-items: center; }
+.statusbar svg { display: block; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ═════════════════════════ A · STICKER PLANNER ═════════════════════════ */
+.v-planner {
+  --page: #FCFCFE;
+  --dot: rgba(70, 92, 170, .22);
+  --ink: #1C2554;
+  --ink-soft: #55608F;
+  --rule: #FF6FAE;
+  --hl-lime: rgba(190, 244, 70, .75);
+  --hl-pink: rgba(255, 122, 182, .38);
+  --hl-sky: rgba(110, 205, 255, .5);
+  --hl-orange: rgba(255, 176, 70, .55);
+  --note: #FFE45C;
+  --note-ink: #1C2554;
+  --strap: #137A5F;
+  --gold: #FFC43A;
+  --heart: #FF6FA3;
+  --leaf: #8EDB3C;
+  background: var(--page);
+  color: var(--ink);
+  font-family: "Shantell Sans", system-ui, sans-serif;
+  font-variation-settings: "INFM" 18, "BNCE" 0;
+  transition: background-color .6s cubic-bezier(.2,.8,.2,1), color .6s;
+}
+body[data-mode="night"] .v-planner {
+  --page: #1A2045;
+  --dot: rgba(150, 168, 255, .2);
+  --ink: #EDF0FF;
+  --ink-soft: #A7B0E6;
+  --rule: #FF7AB6;
+  --hl-lime: rgba(190, 244, 70, .42);
+  --hl-pink: rgba(255, 122, 182, .34);
+  --hl-sky: rgba(110, 205, 255, .34);
+  --hl-orange: rgba(255, 176, 70, .4);
+  --strap: #1E9A79;
+}
+.v-planner ::selection { background: var(--hl-lime); color: inherit; }
+.v-planner .scroll {
+  background-image: radial-gradient(circle, var(--dot) 1.25px, transparent 1.6px);
+  background-size: 18px 18px;
+  background-position: 9px 4px;
+}
+.v-planner .margin-rule {
+  position: absolute; z-index: 1; top: 0; bottom: 0; left: 70px;
+  width: 1px; background: var(--rule); opacity: .7; pointer-events: none;
+}
+.v-planner .strap {
+  position: absolute; z-index: 30; top: 0; bottom: 0; right: 18px; width: 11px;
+  background: var(--strap);
+  box-shadow: -2px 0 6px rgba(10,30,30,.18), inset 2px 0 0 rgba(255,255,255,.18);
+  pointer-events: none;
+}
+.v-planner .scroll { bottom: 96px; }
+.v-planner .page { position: relative; z-index: 2; padding: 0 44px 90px 0; }
+.v-planner .head { display: grid; grid-template-columns: 1fr auto; padding: 8px 0 0 84px; gap: 4px; }
+.v-planner .dayname {
+  margin: 0;
+  font-size: 46px; line-height: 1; font-weight: 700;
+  font-variation-settings: "INFM" 70, "BNCE" 30;
+  letter-spacing: -0.02em;
+  position: relative; display: inline-block; justify-self: start;
+}
+.v-planner .dayname::before {
+  content: ""; position: absolute; z-index: -1;
+  left: -6px; right: -10px; bottom: 2px; height: 20px;
+  background: var(--hl-lime);
+  border-radius: 3px 9px 4px 10px;
+  transform: rotate(-1.4deg);
+}
+.v-planner .date { margin: 6px 0 0; font-size: 17px; color: var(--ink-soft); }
+.v-planner .bean { grid-row: span 2; align-self: start; margin-top: -4px; cursor: pointer; background: none; border: 0; padding: 0; }
+.v-planner .bean svg { width: 70px; height: 70px; transition: transform .35s cubic-bezier(.3,1.6,.5,1); }
+.v-planner .bean:active svg { transform: rotate(-10deg) scale(.94); }
+.v-planner .bean-says {
+  margin: 14px 0 0 84px;
+  font-size: 15.5px; line-height: 1.4;
+  font-variation-settings: "INFM" 80, "BNCE" 20;
+  max-width: 30ch;
+  min-height: 3em;
+  color: var(--ink);
+}
+.v-planner .bean-says .who { color: var(--rule); font-weight: 600; }
+
+/* sticky note */
+.v-planner .note {
+  position: relative;
+  margin: 26px 0 0 30px;
+  padding: 26px 22px 18px;
+  background: var(--note);
+  color: var(--note-ink);
+  border-radius: 2px 3px 6px 2px;
+  transform: rotate(-1.3deg);
+  box-shadow: 0 10px 18px -8px rgba(40,30,0,.38), 0 2px 3px rgba(40,30,0,.12);
+}
+body[data-mode="night"] .v-planner .note { box-shadow: 0 10px 18px -8px rgba(0,0,0,.55), 0 2px 3px rgba(0,0,0,.25); }
+.v-planner .note::after { /* curled corner shadow */
+  content: ""; position: absolute; right: 0; bottom: 0; width: 40px; height: 20px;
+  background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,.07) 50%);
+}
+.v-planner .washi {
+  position: absolute; top: -12px; left: 50%;
+  width: 110px; height: 26px;
+  transform: translateX(-50%) rotate(3deg);
+  background: repeating-linear-gradient(-45deg, rgba(255,120,175,.82) 0 7px, rgba(255,255,255,.75) 7px 14px);
+  opacity: .9;
+  box-shadow: 0 1px 2px rgba(0,0,0,.08);
+  -webkit-mask: linear-gradient(90deg, transparent 0 3px, #000 3px calc(100% - 3px), transparent calc(100% - 3px));
+          mask: linear-gradient(90deg, transparent 0 3px, #000 3px calc(100% - 3px), transparent calc(100% - 3px));
+}
+.v-planner .note-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.v-planner .note h3 { margin: 0; font-size: 21px; font-weight: 700; font-variation-settings: "INFM" 55, "BNCE" 10; }
+.v-planner .note .since { font-size: 14px; opacity: .72; }
+.v-planner .note-row { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; gap: 12px; }
+.v-planner .clock {
+  font-size: 44px; font-weight: 600; line-height: 1;
+  font-variant-numeric: tabular-nums;
+  font-variation-settings: "INFM" 10, "BNCE" 0;
+  letter-spacing: -0.02em;
+}
+.v-planner .penbtn {
+  border: 2px solid currentColor;
+  background: transparent;
+  border-radius: 14px 11px 15px 10px;
+  padding: 8px 16px;
+  font: inherit; font-weight: 600; font-size: 16px;
+  display: inline-flex; gap: 6px; align-items: center;
+  cursor: pointer;
+  transition: transform .2s cubic-bezier(.3,1.6,.5,1), background-color .2s;
+}
+.v-planner .penbtn:hover { background: rgba(28,37,84,.07); }
+.v-planner .penbtn:active { transform: scale(.94) rotate(-2deg); }
+.v-planner .note .tomorrow-line { font-size: 15px; margin-top: 4px; opacity: .8; }
+
+/* section headings */
+.v-planner h4 {
+  margin: 34px 0 10px 84px;
+  font-size: 23px; font-weight: 700;
+  font-variation-settings: "INFM" 75, "BNCE" 25;
+  position: relative; display: inline-block;
+}
+.v-planner h4 svg { position: absolute; left: -2px; bottom: -9px; width: calc(100% + 8px); height: 10px; overflow: visible; }
+
+/* schedule */
+.v-planner .sched { list-style: none; margin: 0; padding: 0; }
+.v-planner .sched li { display: grid; grid-template-columns: 70px 1fr; align-items: baseline; min-height: 54px; padding: 6px 0; }
+.v-planner .sched time {
+  font-size: 15px; text-align: right; padding-right: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+  font-variation-settings: "INFM" 30, "BNCE" 0;
+}
+.v-planner .sched .t { padding-left: 14px; font-size: 17px; font-weight: 600; }
+.v-planner .sched .t span { position: relative; z-index: 0; }
+.v-planner .sched .s { display: block; font-size: 14px; font-weight: 400; color: var(--ink-soft); margin-top: 2px; }
+.v-planner .sched li.past .t > span:first-child { text-decoration: line-through; text-decoration-thickness: 1.5px; text-decoration-color: var(--ink-soft); color: var(--ink-soft); }
+.v-planner .sched li.next .t > span:first-child::before {
+  content: ""; position: absolute; z-index: -1; left: -4px; right: -6px; bottom: 1px; height: 11px;
+  background: var(--hl-sky); border-radius: 2px 6px 3px 7px; transform: rotate(-.8deg);
+}
+.v-planner .sched li.next time { color: var(--ink); font-weight: 600; }
+
+/* tasks */
+.v-planner .tasks { list-style: none; margin: 0; padding: 0 0 0 84px; }
+.v-planner .task {
+  display: flex; align-items: center; gap: 14px;
+  padding: 9px 0; cursor: pointer; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  font-size: 17px; position: relative;
+}
+.v-planner .task .box { position: relative; width: 28px; height: 28px; flex: none; }
+.v-planner .task .box svg.outline { position: absolute; inset: 0; width: 28px; height: 28px; }
+.v-planner .task .stk {
+  position: absolute; left: -7px; top: -8px; width: 42px; height: 42px;
+  opacity: 0; transform: scale(1.9) rotate(-30deg);
+  filter: drop-shadow(0 3px 2px rgba(30,20,0,.25));
+}
+.v-planner .task.done .stk { opacity: 1; transform: scale(1) rotate(-9deg); transition: transform .32s cubic-bezier(.3,1.7,.5,1), opacity .12s; }
+.v-planner .task .label { position: relative; z-index: 0; transition: color .3s .15s; }
+.v-planner .task .label::after {
+  content: ""; position: absolute; z-index: -1; left: -4px; top: 55%; height: 12px; width: 0;
+  background: var(--hl-lime); border-radius: 3px 8px 4px 9px; transform: translateY(-50%) rotate(-.6deg);
+}
+.v-planner .task.done .label { color: var(--ink-soft); }
+.v-planner .task.done .label::after { width: calc(100% + 10px); transition: width .38s cubic-bezier(.2,.8,.2,1) .14s; }
+.v-planner .task .from {
+  display: block; font-size: 13px; color: var(--rule);
+  font-variation-settings: "INFM" 90, "BNCE" 40;
+  margin-top: 1px;
+}
+.v-planner .task.flagged .label::before { /* stays lit until seen */
+  content: ""; position: absolute; z-index: -2; inset: -2px -6px; border-radius: 6px 10px 5px 12px;
+  background: var(--hl-pink);
+}
+.v-planner .task.done .from { opacity: .5; }
+
+/* sticker chart */
+.v-planner .chart { margin: 0; padding: 0 0 0 84px; list-style: none; }
+.v-planner .chart li { display: grid; grid-template-columns: 96px 1fr; align-items: center; padding: 7px 0; }
+.v-planner .chart .g { font-size: 17px; font-weight: 600; }
+.v-planner .chart .g small { display: block; font-size: 13px; font-weight: 400; color: var(--ink-soft); }
+.v-planner .slots { display: flex; gap: 6px; }
+.v-planner .slot {
+  width: 34px; height: 34px; padding: 0; border: 0; background: none; cursor: pointer; position: relative;
+}
+.v-planner .slot svg.ring { position: absolute; inset: 3px; width: 28px; height: 28px; }
+.v-planner .slot .stk {
+  position: absolute; inset: -3px; width: 40px; height: 40px;
+  opacity: 0; transform: scale(1.9) rotate(25deg);
+  filter: drop-shadow(0 3px 2px rgba(30,20,0,.22));
+}
+.v-planner .slot.on .stk { opacity: 1; transform: scale(1) rotate(-6deg); transition: transform .32s cubic-bezier(.3,1.7,.5,1), opacity .1s; }
+.v-planner .slot:nth-child(2n).on .stk { transform: scale(1) rotate(8deg); }
+
+/* quick add */
+.v-planner .quick {
+  position: absolute; z-index: 20; left: 0; right: 0; bottom: 96px;
+  padding: 10px 44px 10px 84px;
+  background: linear-gradient(to top, var(--page) 70%, transparent);
+}
+.v-planner .quick label { display: flex; align-items: center; gap: 10px; border-bottom: 2px solid var(--ink); padding-bottom: 6px; }
+.v-planner .quick i { font-size: 22px; }
+.v-planner .quick input {
+  flex: 1; min-width: 0; border: 0; background: transparent; outline: none;
+  font: inherit; font-size: 17px; color: var(--ink);
+  font-variation-settings: "INFM" 60, "BNCE" 10;
+  caret-color: var(--rule);
+}
+.v-planner .quick input::placeholder { color: var(--ink-soft); opacity: .85; }
+
+/* index tabs */
+.v-planner .tabs {
+  position: absolute; z-index: 25; left: 0; right: 0; bottom: 0; height: 96px;
+  display: flex; align-items: flex-start; gap: 4px; padding: 0 40px 0 24px;
+}
+.v-planner .tabs::before { /* the planner cover, below the page edge */
+  content: ""; position: absolute; inset: 0;
+  background: #0F1A3D; z-index: -1;
+  box-shadow: inset 0 6px 8px -6px rgba(0,0,0,.5);
+}
+body[data-mode="night"] .v-planner .tabs::before { background: #0B1029; }
+.v-planner .tab {
+  flex: 1; height: 54px; border: 0; padding: 0; cursor: pointer;
+  border-radius: 0 0 12px 12px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+  font: inherit; font-size: 12px; font-weight: 600; color: #1C2554;
+  font-variation-settings: "INFM" 40;
+  margin-top: 4px;
+  transition: transform .3s cubic-bezier(.3,1.5,.5,1);
+  box-shadow: 0 4px 6px -3px rgba(0,0,0,.35);
+}
+.v-planner .tab i { font-size: 21px; }
+.v-planner .tab[aria-current="page"] { margin-top: -6px; height: 64px; border-radius: 0 0 12px 12px; background: var(--page); color: var(--ink); box-shadow: 0 6px 8px -4px rgba(0,0,0,.35); }
+.v-planner .tab:not([aria-current]):hover { transform: translateY(3px); }
+
+/* ═════════════════════════ B · COSY QUEST ═════════════════════════ */
+.v-quest {
+  --sky: #8BD3F2;
+  --sky-deep: #6BC1E8;
+  --panel: #FFFFFF;
+  --ink: #3A3156;
+  --ink-soft: #6E6590;
+  --line: #E7E2F3;
+  --leaf: #5DBB63;
+  --sun: #FFC93C;
+  --peach: #FF8F6E;
+  --lilac: #B49CFF;
+  --teal: #3FB3A6;
+  --rose: #FF7AA8;
+  background: var(--sky);
+  color: var(--ink);
+  font-family: "M PLUS Rounded 1c", system-ui, sans-serif;
+  transition: background-color .6s cubic-bezier(.2,.8,.2,1);
+}
+body[data-mode="night"] .v-quest {
+  --sky: #2B2A63;
+  --sky-deep: #232259;
+  --panel: #FBFAFF;
+}
+.v-quest ::selection { background: var(--sun); color: var(--ink); }
+.v-quest .statusbar { color: var(--ink); }
+body[data-mode="night"] .v-quest .statusbar { color: #fff; }
+.v-quest .cloud { position: absolute; z-index: 0; fill: #fff; opacity: .85; animation: drift 38s linear infinite; }
+.v-quest .cloud.c2 { animation-duration: 52s; animation-delay: -20s; opacity: .6; }
+@keyframes drift { from { transform: translateX(-140px); } to { transform: translateX(440px); } }
+.v-quest .stars { position: absolute; inset: 0; z-index: 0; opacity: 0; transition: opacity .8s; pointer-events: none; }
+body[data-mode="night"] .v-quest .stars { opacity: 1; }
+body[data-mode="night"] .v-quest .cloud { opacity: .12; }
+.v-quest .stars i { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #fff; animation: twinkle 3s ease-in-out infinite; }
+@keyframes twinkle { 50% { opacity: .25; } }
+.v-quest .page { position: relative; z-index: 2; padding: 0 16px 190px; }
+.v-quest .hud { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+.v-quest .pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--panel); border-radius: 999px; padding: 8px 14px 8px 10px;
+  font-weight: 800; font-size: 15px;
+  box-shadow: 0 4px 10px -4px rgba(40,30,90,.3);
+}
+.v-quest .pill .sub { font-weight: 500; color: var(--ink-soft); }
+.v-quest .pill i { font-size: 20px; }
+.v-quest .pill .cal { color: var(--peach); }
+.v-quest .pill .star { color: var(--sun); }
+.v-quest .dust { font-variant-numeric: tabular-nums; display: inline-block; }
+.v-quest .dust.bump { animation: bump .45s cubic-bezier(.3,1.6,.5,1); }
+@keyframes bump { 40% { transform: scale(1.35); color: #E09A00; } }
+
+.v-quest .talk { position: relative; margin-top: 22px; padding-left: 70px; min-height: 108px; }
+.v-quest .bean { position: absolute; left: -4px; top: 18px; width: 84px; height: 84px; border: 0; background: none; padding: 0; cursor: pointer; z-index: 2; }
+.v-quest .bean svg { width: 100%; height: 100%; animation: bob 3.2s ease-in-out infinite; transform-origin: 50% 90%; }
+@keyframes bob { 50% { transform: translateY(-4px) rotate(2deg); } }
+.v-quest .bubble {
+  position: relative;
+  background: var(--panel);
+  border-radius: 26px;
+  padding: 22px 20px 18px 26px;
+  font-weight: 500; font-size: 16px; line-height: 1.5;
+  box-shadow: 0 6px 14px -6px rgba(40,30,90,.32);
+  min-height: 96px;
+}
+.v-quest .bubble .name {
+  position: absolute; top: -13px; left: 20px;
+  background: var(--lilac); color: #fff; font-weight: 800; font-size: 14px;
+  padding: 4px 14px; border-radius: 999px; transform: rotate(-3deg);
+}
+.v-quest .bubble .more { position: absolute; right: 16px; bottom: 10px; color: var(--peach); font-size: 14px; animation: nudge 1s ease-in-out infinite; }
+@keyframes nudge { 50% { transform: translateY(3px); } }
+
+.v-quest .panel {
+  background: var(--panel); border-radius: 26px; padding: 18px 18px 14px;
+  margin-top: 14px;
+  box-shadow: 0 6px 14px -6px rgba(40,30,90,.3);
+}
+.v-quest .panel h3 { margin: 0 0 10px; font-size: 19px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+.v-quest .panel h3 i { font-size: 22px; }
+.v-quest .tile {
+  width: 44px; height: 44px; border-radius: 15px; flex: none;
+  display: grid; place-items: center; color: #fff; font-size: 23px;
+}
+.v-quest .activity { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; }
+.v-quest .activity .what b { display: block; font-size: 17px; font-weight: 800; }
+.v-quest .activity .what span { font-size: 14px; color: var(--ink-soft); font-weight: 500; }
+.v-quest .activity .clock { font-size: 28px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+.v-quest .activity .bar { grid-column: 1 / -1; height: 12px; border-radius: 99px; background: var(--line); overflow: hidden; margin-top: 4px; }
+.v-quest .activity .bar span { display: block; height: 100%; width: 57%; border-radius: inherit; background: var(--teal); transition: width 1s linear; }
+.v-quest .chunky {
+  border: 0; cursor: pointer; border-radius: 16px; padding: 11px 18px;
+  font: inherit; font-weight: 800; font-size: 16px; color: #fff; background: var(--peach);
+  box-shadow: 0 5px 10px -4px rgba(255,100,70,.6);
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: transform .2s cubic-bezier(.3,1.6,.5,1), box-shadow .2s;
+}
+.v-quest .chunky:hover { transform: translateY(-1px); }
+.v-quest .chunky:active { transform: scale(.93); box-shadow: 0 2px 4px -2px rgba(255,100,70,.6); }
+.v-quest .chunky.go { background: var(--leaf); box-shadow: 0 5px 10px -4px rgba(60,150,70,.6); }
+.v-quest .act-foot { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 14px; color: var(--ink-soft); font-weight: 500; }
+
+.v-quest .rows { list-style: none; margin: 0; padding: 0; }
+.v-quest .rows li { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-top: 2px dashed var(--line); }
+.v-quest .rows li:first-child { border-top: 0; }
+.v-quest .rows .tile { width: 38px; height: 38px; border-radius: 13px; font-size: 20px; }
+.v-quest .rows .txt { flex: 1; min-width: 0; }
+.v-quest .rows .txt b { display: block; font-weight: 700; font-size: 16px; }
+.v-quest .rows .txt span { display: block; font-size: 13px; color: var(--ink-soft); font-weight: 500; }
+.v-quest .rows time { font-weight: 800; font-size: 14px; background: var(--line); padding: 4px 10px; border-radius: 999px; font-variant-numeric: tabular-nums; }
+.v-quest .rows li.past { opacity: .5; }
+.v-quest .rows li.next time { background: var(--sun); }
+
+.v-quest .quest { cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; position: relative; }
+.v-quest .check {
+  width: 34px; height: 34px; border-radius: 50%; flex: none;
+  border: 3px solid var(--ink); display: grid; place-items: center; color: #fff;
+  transition: background-color .2s, border-color .2s, transform .35s cubic-bezier(.3,1.8,.5,1);
+}
+.v-quest .check i { font-size: 20px; transform: scale(0); transition: transform .35s cubic-bezier(.3,1.8,.5,1) .05s; }
+.v-quest .quest.done .check { background: var(--leaf); border-color: var(--leaf); transform: scale(1.12); }
+.v-quest .quest.done .check i { transform: scale(1); }
+.v-quest .quest.done .txt b { color: var(--ink-soft); text-decoration: line-through; text-decoration-thickness: 2px; }
+.v-quest .rows .txt .new { display: inline-block; font-size: 12px; font-weight: 800; color: #fff; background: var(--rose); padding: 1px 8px; border-radius: 99px; margin-left: 6px; vertical-align: 2px; }
+.v-quest .quest.flagged { background: rgba(255,122,168,.1); margin: 0 -10px; padding: 8px 10px; border-radius: 16px; border-top-color: transparent; }
+.v-quest .quest.flagged + li { border-top-color: transparent; }
+.v-quest .reward {
+  position: absolute; left: 4px; top: 0;
+  font-weight: 800; color: #E09A00; font-size: 16px;
+  pointer-events: none; display: flex; align-items: center; gap: 2px;
+  animation: floatup 1s cubic-bezier(.2,.8,.2,1) forwards;
+}
+@keyframes floatup { 0% { opacity: 0; transform: translateY(6px) scale(.6); } 20% { opacity: 1; transform: translateY(-8px) scale(1.15); } 100% { opacity: 0; transform: translateY(-38px) scale(1); } }
+.v-quest .spark { position: absolute; width: 8px; height: 8px; pointer-events: none; color: var(--sun); font-size: 12px; animation: burst .6s cubic-bezier(.2,.8,.2,1) forwards; }
+@keyframes burst { from { opacity: 1; transform: translate(0,0) scale(.4); } to { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.1) rotate(90deg); } }
+
+.v-quest .goals { list-style: none; margin: 0; padding: 0; }
+.v-quest .goals li { display: grid; grid-template-columns: 38px 1fr auto; gap: 4px 12px; align-items: center; padding: 7px 0; cursor: pointer; }
+.v-quest .goals .tile { width: 38px; height: 38px; border-radius: 13px; font-size: 20px; grid-row: span 2; }
+.v-quest .goals b { font-weight: 700; font-size: 15px; }
+.v-quest .goals .count { font-weight: 800; font-size: 14px; font-variant-numeric: tabular-nums; }
+.v-quest .segs { grid-column: 2 / -1; display: flex; gap: 5px; }
+.v-quest .segs span { flex: 1; height: 12px; border-radius: 99px; background: var(--line); transition: background-color .25s; }
+.v-quest .segs span.on { background: var(--c); animation: segpop .4s cubic-bezier(.3,1.7,.5,1); }
+@keyframes segpop { 40% { transform: scaleY(1.6); } }
+
+.v-quest::after, .v-map::after { /* fade content out behind the floating controls */
+  content: ""; position: absolute; z-index: 15; left: 0; right: 0; bottom: 0; height: 190px; pointer-events: none;
+  background: linear-gradient(to top, var(--sky) 62%, transparent);
+}
+.v-map::after { background: linear-gradient(to top, var(--water) 66%, transparent); height: 180px; }
+.v-quest .quick {
+  position: absolute; z-index: 20; left: 16px; right: 16px; bottom: 104px;
+  display: flex; align-items: center; gap: 10px;
+  background: var(--panel); border-radius: 999px; padding: 6px 6px 6px 18px;
+  box-shadow: 0 8px 18px -8px rgba(40,30,90,.45);
+}
+.v-quest .quick input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: inherit; font-size: 16px; font-weight: 500; color: var(--ink); caret-color: var(--peach); }
+.v-quest .quick input::placeholder { color: var(--ink-soft); }
+.v-quest .quick button { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--sun); color: var(--ink); font-size: 22px; display: grid; place-items: center; cursor: pointer; transition: transform .25s cubic-bezier(.3,1.6,.5,1); }
+.v-quest .quick button:active { transform: scale(.88) rotate(90deg); }
+.v-quest .dock {
+  position: absolute; z-index: 20; left: 16px; right: 16px; bottom: 26px; height: 66px;
+  background: var(--panel); border-radius: 28px;
+  display: flex; justify-content: space-around; align-items: center; padding: 0 6px;
+  box-shadow: 0 8px 18px -8px rgba(40,30,90,.45);
+}
+.v-quest .dock button { border: 0; background: transparent; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 1px; font: inherit; font-size: 11px; font-weight: 700; color: var(--ink-soft); padding: 6px 10px; border-radius: 18px; transition: background-color .25s, transform .25s cubic-bezier(.3,1.6,.5,1); }
+.v-quest .dock button i { font-size: 24px; }
+.v-quest .dock button[aria-current="page"] { background: #E5F5FC; color: var(--ink); }
+.v-quest .dock button:active { transform: scale(.9); }
+
+/* ═════════════════════════ C · ISLAND MAP ═════════════════════════ */
+.v-map {
+  --water: #F5F1E4;
+  --land: #8ED462;
+  --ink: #2C2E2A;
+  --ink-on-water: #2C2E2A;
+  --soft-on-water: #5E6159;
+  --yellow: #F5E211;
+  --coral: #FF705D;
+  --blue: #2BA0FF;
+  --lilac: #EBC1FF;
+  --white: #FFFFFF;
+  background: var(--water);
+  color: var(--ink-on-water);
+  font-family: "Bricolage Grotesque", system-ui, sans-serif;
+  font-weight: 600;
+  font-variation-settings: "opsz" 14;
+  transition: background-color .6s cubic-bezier(.2,.8,.2,1);
+}
+body[data-mode="night"] .v-map {
+  --water: #1C2130;
+  --ink-on-water: #F5F1E4;
+  --soft-on-water: #AEB3C2;
+  --white: #2A3144;
+}
+.v-map ::selection { background: var(--yellow); color: var(--ink); }
+.v-map .statusbar { color: var(--ink); position: absolute; left: 0; right: 0; top: 0; }
+.v-map .coast { position: relative; height: 372px; }
+.v-map .coast svg.land { position: absolute; left: 0; top: 0; width: 390px; height: 372px; }
+.v-map .coast .land path { fill: var(--land); }
+.v-map .coast-inner { position: relative; z-index: 2; padding: 60px 24px 0; color: var(--ink); }
+.v-map .big {
+  margin: 6px 0 0; font-size: 84px; line-height: .95; letter-spacing: -0.05em;
+  font-variation-settings: "opsz" 96;
+}
+.v-map .when { margin: 8px 0 0; font-size: 18px; letter-spacing: -0.01em; }
+.v-map .bean-line { margin: 14px 0 0; font-size: 16px; line-height: 1.35; max-width: 24ch; min-height: 2.7em; letter-spacing: -0.01em; }
+.v-map .bean { position: absolute; z-index: 3; right: 26px; top: 212px; width: 92px; height: 92px; border: 0; background: none; padding: 0; cursor: pointer; }
+.v-map .bean svg { width: 100%; height: 100%; transition: transform .4s cubic-bezier(.3,1.7,.4,1); }
+.v-map .bean:active svg { transform: translateY(6px) scale(1.05, .9); }
+
+.v-map .cap {
+  position: relative; display: flex; align-items: center; gap: 10px;
+  border: 0; border-radius: 999px; padding: 8px 8px 8px 20px; min-height: 56px;
+  font: inherit; color: var(--ink); text-align: left; cursor: pointer; width: 100%;
+  transition: background-color .4s cubic-bezier(.3,1.5,.5,1), transform .4s cubic-bezier(.3,1.5,.5,1);
+  -webkit-tap-highlight-color: transparent;
+}
+.v-map .cap .chip {
+  position: absolute; top: 8px; width: 40px; height: 40px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 20px;
+  right: 8px; left: auto;
+  transition: right .4s cubic-bezier(.3,1.5,.5,1), background-color .3s, color .3s;
+}
+.v-map .cap .cap-txt { flex: 1; min-width: 0; padding-right: 48px; transition: padding .4s cubic-bezier(.3,1.5,.5,1); }
+.v-map .cap.live .cap-txt { padding-left: 48px; padding-right: 0; }
+.v-map .cap.live .chip { right: calc(100% - 48px); }
+.v-map .cap:active { transform: scale(.97); }
+
+.v-map .now { margin-top: 18px; background: var(--yellow); }
+.v-map .now .chip { background: var(--blue); color: #fff; }
+.v-map .now .cap-txt b { display: block; font-size: 15px; letter-spacing: -0.01em; }
+.v-map .now .cap-txt .clock { font-size: 26px; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; line-height: 1.05; }
+
+.v-map .sea { padding: 6px 24px 200px; position: relative; z-index: 2; }
+.v-map h3 { margin: 30px 0 12px; font-size: 34px; line-height: .95; letter-spacing: -0.045em; font-variation-settings: "opsz" 72; }
+.v-map .events { list-style: none; margin: 0; padding: 0; }
+.v-map .events li { display: grid; grid-template-columns: 58px 1fr auto; align-items: center; gap: 10px; padding: 9px 0; }
+.v-map .events time { font-size: 17px; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.v-map .events .t { font-size: 17px; letter-spacing: -0.01em; line-height: 1.2; }
+.v-map .events .t span { display: block; font-size: 14px; color: var(--soft-on-water); margin-top: 1px; }
+.v-map .events li.past { opacity: .45; }
+.v-map .events li.past .t { text-decoration: line-through; }
+.v-map .lbl { font-size: 13px; padding: 4px 11px; border-radius: 999px; color: var(--ink); letter-spacing: 0; }
+.v-map .lbl.coral { background: var(--coral); }
+.v-map .lbl.blue { background: var(--blue); color: #fff; }
+.v-map .lbl.lilac { background: var(--lilac); }
+.v-map .lbl.green { background: var(--land); }
+
+.v-map .todo { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.v-map .todo .cap { background: var(--white); color: var(--ink-on-water); font-size: 17px; letter-spacing: -0.01em; min-height: 54px; }
+.v-map .todo .cap .chip { width: 38px; height: 38px; box-shadow: inset 0 0 0 2.5px var(--ink-on-water); color: transparent; }
+.v-map .todo .cap.live { background: var(--land); color: var(--ink); }
+.v-map .todo .cap.live .chip { box-shadow: none; background: var(--ink); color: var(--land); }
+.v-map .todo .cap.live .cap-txt { text-decoration: line-through; text-decoration-thickness: 2px; }
+.v-map .todo .cap .from { display: block; font-size: 13px; color: var(--coral); }
+.v-map .todo .cap.flagged:not(.live) { box-shadow: inset 0 0 0 2.5px var(--coral); }
+.v-map .todo .cap.live .from { color: var(--ink); opacity: .6; }
+
+.v-map .islands { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 4px; }
+.v-map .isle { border: 0; background: none; padding: 0; cursor: pointer; position: relative; height: 128px; color: var(--ink); font: inherit; -webkit-tap-highlight-color: transparent; }
+.v-map .isle svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.v-map .isle svg path { transform-box: fill-box; transform-origin: center; transition: transform .4s cubic-bezier(.3,1.7,.4,1); }
+.v-map .isle .it { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; line-height: 1.05; pointer-events: none; }
+.v-map .isle .it b { font-size: 15px; letter-spacing: -0.02em; max-width: 8ch; }
+.v-map .isle .it span { font-size: 22px; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.v-map .isle.full .it::after { content: "done"; font-size: 12px; margin-top: 2px; }
+
+.v-map .quick {
+  position: absolute; z-index: 20; left: 16px; right: 16px; bottom: 98px;
+  display: flex; align-items: center; background: var(--yellow); border-radius: 999px; padding: 7px 7px 7px 22px; min-height: 58px;
+  box-shadow: 0 10px 20px -10px rgba(30,30,20,.35);
+}
+.v-map .quick input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: inherit; font-size: 17px; color: var(--ink); letter-spacing: -0.01em; caret-color: var(--coral); }
+.v-map .quick input::placeholder { color: rgba(44,46,42,.62); }
+.v-map .quick button { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--blue); color: #fff; font-size: 22px; display: grid; place-items: center; cursor: pointer; transition: transform .4s cubic-bezier(.3,1.7,.4,1); }
+.v-map .quick button:active { transform: scale(.85); }
+.v-map .navcaps {
+  position: absolute; z-index: 20; left: 0; right: 0; bottom: 0; height: 92px;
+  display: flex; gap: 6px; justify-content: center; align-items: flex-start; padding: 16px 12px 0;
+  background: var(--water);
+}
+.v-map .navcaps button {
+  border: 0; background: transparent; color: var(--ink-on-water); font: inherit; font-size: 15px; letter-spacing: -0.01em;
+  padding: 10px 14px; border-radius: 999px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: background-color .3s;
+}
+.v-map .navcaps button i { font-size: 18px; }
+.v-map .navcaps button[aria-current="page"] { background: var(--lilac); color: var(--ink); }
+
+/* motion safety */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; transition-delay: 0s !important; }
+}
+</style>
+</head>
+<body data-mode="day">
+
+<header class="shell-head">
+  <div>
+    <h1>Three looks for Orbit’s Today screen</h1>
+    <p>The same Monday drawn three ways. Everything in the phones is clickable: tick things off, tap the weekly goals, stop the timer, poke the moon. All the events and numbers are made up.</p>
+  </div>
+  <div class="shell-controls">
+    <div class="seg" role="group" aria-label="Time of day">
+      <button type="button" data-mode-btn="day" aria-pressed="true"><i class="ph ph-sun"></i>Morning</button>
+      <button type="button" data-mode-btn="night" aria-pressed="false"><i class="ph ph-moon-stars"></i>Bedtime</button>
+    </div>
+    <div class="seg" role="group" aria-label="Sound">
+      <button type="button" id="soundBtn" aria-pressed="true"><i class="ph ph-speaker-simple-high"></i>Sound</button>
+    </div>
+  </div>
+</header>
+
+<nav class="picker" aria-label="Choose a look">
+  <div class="seg">
+    <button type="button" data-show="planner" aria-pressed="true">Sticker Planner</button>
+    <button type="button" data-show="quest" aria-pressed="false">Cosy Quest</button>
+    <button type="button" data-show="map" aria-pressed="false">Island Map</button>
+  </div>
+</nav>
+
+<main class="lineup">
+
+  <!-- ═════════ A · STICKER PLANNER ═════════ -->
+  <section class="option is-shown" id="opt-planner" aria-labelledby="h-planner">
+    <div class="phone"><div class="screen v-planner" id="planner"></div><div class="island-notch"></div></div>
+    <div class="about">
+      <h2 id="h-planner">Sticker Planner</h2>
+      <p class="thesis">Your favourite paper planner, but it never runs out of stickers. Ticking something off slaps a puffy star on it and runs a highlighter through it.</p>
+      <div class="chips" aria-hidden="true"><span style="background:#FCFCFE"></span><span style="background:#1C2554"></span><span style="background:#FF6FAE"></span><span style="background:#BEF446"></span><span style="background:#FFE45C"></span><span style="background:#137A5F"></span></div>
+      <dl>
+        <dt>Feels like</dt><dd>Dot-grid paper, gel pen, washi tape, an elastic strap. Bedtime turns the page navy.</dd>
+        <dt>Try</dt><dd>Tick a task. Tap an empty circle in the sticker chart.</dd>
+        <dt>Watch out</dt><dd>Stickers everywhere could turn into scrapbook clutter, so it only stays calm if the page is kept to ink and highlighter.</dd>
+      </dl>
+      <div class="raises">
+        <p><b>From a train departure board:</b> times sit in a fixed margin so the day always reads top to bottom.</p>
+        <p><b>From a full-screen video feed:</b> only what’s happening now gets the big sticky note.</p>
+        <p><b>From an airport gate board:</b> something that changed, like a task carried over, stays highlighted until you’ve dealt with it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ B · COSY QUEST ═════════ -->
+  <section class="option" id="opt-quest" aria-labelledby="h-quest">
+    <div class="phone"><div class="screen v-quest" id="quest"></div><div class="island-notch"></div></div>
+    <div class="about">
+      <h2 id="h-quest">Cosy Quest <span class="pick-tag">My pick</span></h2>
+      <p class="thesis">Your day as a cosy life-sim. Bean chats to you like a village neighbour, tasks are quests, and finishing them earns stardust.</p>
+      <div class="chips" aria-hidden="true"><span style="background:#8BD3F2"></span><span style="background:#FFFFFF"></span><span style="background:#3A3156"></span><span style="background:#5DBB63"></span><span style="background:#FFC93C"></span><span style="background:#FF8F6E"></span></div>
+      <dl>
+        <dt>Feels like</dt><dd>Animal Crossing’s phone, Stardew mornings. Chunky rounded panels on an open sky, and the stars come out at bedtime.</dd>
+        <dt>Try</dt><dd>Tick a quest. Tap Bean to hear more. Tap a weekly goal.</dd>
+        <dt>Watch out</dt><dd>This is the most familiar of the three: lots of cosy apps look like this. Points and quests could also start to feel like homework.</dd>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ═════════ C · ISLAND MAP ═════════ -->
+  <section class="option" id="opt-map" aria-labelledby="h-map">
+    <div class="phone"><div class="screen v-map" id="map"></div><div class="island-notch"></div></div>
+    <div class="about">
+      <h2 id="h-map">Island Map</h2>
+      <p class="thesis">Your week as a bright holiday-park map. Today is the big green island, and each weekly goal is a small island that grows as you make progress.</p>
+      <div class="chips" aria-hidden="true"><span style="background:#8ED462"></span><span style="background:#F5F1E4"></span><span style="background:#2C2E2A"></span><span style="background:#F5E211"></span><span style="background:#FF705D"></span><span style="background:#2BA0FF"></span><span style="background:#EBC1FF"></span></div>
+      <dl>
+        <dt>Feels like</dt><dd>A creased guide map from a summer day out: flat bold colour, no grain, everything bouncy.</dd>
+        <dt>Try</dt><dd>Tap a to-do and watch the dot slide across. Tap an island.</dd>
+        <dt>Watch out</dt><dd>The boldest and least planner-like of the three. A map shows time less clearly than a list, and the blob shapes take real care to carry over to the calendar and meal screens.</dd>
+      </dl>
+    </div>
+  </section>
+</main>
+
+<footer class="shell-foot">
+  <h3>Also considered, and why they lost</h3>
+  <ul>
+    <li><b>Split-flap departure board</b>: satisfying clacks, but too cold and stationy to feel cosy.</li>
+    <li><b>Full-screen swipe feed</b>: one thing at a time, but it’s the doom-scroll shape you’re trying to escape.</li>
+    <li><b>Annotated old book</b>: beautiful rules and margins, but far too serious.</li>
+    <li><b>Packed Japanese web page</b>: fits loads on one screen, which is exactly the clutter you don’t want.</li>
+    <li><b>Boarding pass and gate board</b>: very clear about changes, but feels like a business trip.</li>
+  </ul>
+  <p>Want something classic and clean instead, like Things or Structured? Just say so.</p>
+</footer>
+
+<script>
+/* ─────────── shared sample day (illustrative only) ─────────── */
+const MODES = {
+  day: {
+    clock: '10:42', greet: 'Morning',
+    lines: [
+      'Morning! Three things left on the list, and the gym’s at six. You’ve got this.',
+      'Lunch is already sorted: chicken and rice, three portions left in the fridge.',
+      'You haven’t been out since Saturday. Pub quiz tonight counts, by the way.',
+      'Small reminder that water exists and you are allowed to drink it.'
+    ],
+    timer: true,
+    pastUntil: 0,     // schedule items before this index are already past
+    nextIdx: 0        // the work block is happening now
+  },
+  night: {
+    clock: '23:05', greet: 'Night',
+    lines: [
+      'Bedtime! Gym done, quiz done. That was a properly good Monday.',
+      'Tomorrow: dentist at three. I’ll nudge you in the morning.',
+      'You logged 5h 12m on the website today. Your brain can clock off now.',
+      'Phone down soon? I’ll keep an eye on everything.'
+    ],
+    timer: false,
+    pastUntil: 4,
+    nextIdx: -1
+  }
+};
+const SCHEDULE = [
+  { t: '09:00', title: 'Website build', sub: 'Work block', area: 'work' },
+  { t: '13:00', title: 'Lunch: chicken & rice', sub: 'Prepped Sunday · 3 left', area: 'food' },
+  { t: '18:00', title: 'Gym: legs', sub: 'Bring the blue bottle', area: 'body' },
+  { t: '20:00', title: 'Pub quiz with Sam', sub: 'The Crown, Mill Road', area: 'out' }
+];
+const TASKS = [
+  { title: 'Book the dentist', done: true },
+  { title: 'Reply to the landlord', done: false, flagged: true, from: 'carried over from last week' },
+  { title: 'Buy oat milk', done: false },
+  { title: 'Wash the gym kit', done: false }
+];
+const GOALS = [
+  { title: 'Gym', n: 1, of: 3, area: 'body' },
+  { title: 'Cook at home', n: 2, of: 4, area: 'food' },
+  { title: 'Go out', n: 0, of: 2, area: 'out' }
+];
+const AREA_ICON = { work: 'ph-laptop', food: 'ph-cooking-pot', body: 'ph-barbell', out: 'ph-confetti' };
+const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ─────────── tiny sound kit (WebAudio, no files) ─────────── */
+let soundOn = true, actx = null;
+function blip(kind) {
+  if (!soundOn) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const t = actx.currentTime;
+    const tone = (f, start, dur, type = 'sine', vol = .12, glideTo) => {
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = type; o.frequency.setValueAtTime(f, t + start);
+      if (glideTo) o.frequency.exponentialRampToValueAtTime(glideTo, t + start + dur);
+      g.gain.setValueAtTime(0.0001, t + start);
+      g.gain.exponentialRampToValueAtTime(vol, t + start + .012);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + start + dur);
+      o.connect(g).connect(actx.destination); o.start(t + start); o.stop(t + start + dur + .02);
+    };
+    if (kind === 'stamp') { tone(180, 0, .12, 'triangle', .22, 70); tone(900, .0, .05, 'sine', .05); }
+    if (kind === 'chime') { tone(784, 0, .16, 'sine', .1); tone(1175, .08, .26, 'sine', .09); }
+    if (kind === 'plip')  { tone(420, 0, .18, 'sine', .14, 980); }
+    if (kind === 'pop')   { tone(600, 0, .08, 'sine', .08, 300); }
+  } catch (e) { /* audio is a bonus */ }
+}
+
+/* ─────────── shared bits ─────────── */
+function statusBar(clock) {
+  return `<div class="statusbar"><span>${clock}</span><span class="sb-icons" aria-hidden="true">
+    <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+    <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 2.3c2.3 0 4.4.9 6 2.4l1.2-1.3A10.3 10.3 0 0 0 8 .5 10.3 10.3 0 0 0 .8 3.4L2 4.7a8.5 8.5 0 0 1 6-2.4Zm0 3.6c1.3 0 2.5.5 3.4 1.3l1.2-1.3A6.7 6.7 0 0 0 8 4.1c-1.8 0-3.4.7-4.6 1.8l1.2 1.3c.9-.8 2.1-1.3 3.4-1.3Zm0 3.5c-.6 0-1.1.2-1.5.6L8 11.5l1.5-1.5c-.4-.4-.9-.6-1.5-.6Z"/></svg>
+    <svg width="27" height="13" viewBox="0 0 27 13" fill="none"><rect x=".5" y=".5" width="23" height="12" rx="3.5" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="17" height="9" rx="2" fill="currentColor"/><path d="M25 4.5v4c.8-.3 1.3-1.1 1.3-2s-.5-1.7-1.3-2Z" fill="currentColor" opacity=".45"/></svg>
+  </span></div>`;
+}
+function fmt(sec) {
+  const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60;
+  return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+let mode = 'day';
+let timerBase = 6138; // 1:42:18
+const timers = {}; // per-view running flags
+
+/* ═════════ A · Sticker Planner ═════════ */
+const PEN_BOX = `<svg class="outline" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 5.2c6-.9 12.6-1.1 19-.4.6 6 .8 12.3.2 18.6-6.2.7-12.6.6-18.9.1-.7-6-.8-12.2-.3-18.3Z"/></svg>`;
+const STICKERS = {
+  star: c => `<svg class="stk" viewBox="0 0 44 44"><path d="M22 3.5l5.4 11.2 12.3 1.6-9 8.6 2.3 12.2L22 31.2l-11 5.9 2.3-12.2-9-8.6 12.3-1.6Z" fill="#fff" stroke="#fff" stroke-width="5" stroke-linejoin="round"/><path d="M22 3.5l5.4 11.2 12.3 1.6-9 8.6 2.3 12.2L22 31.2l-11 5.9 2.3-12.2-9-8.6 12.3-1.6Z" fill="${c}"/><path d="M16 13.5c2-1 4-1.4 6-1.3" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".7" fill="none"/></svg>`,
+  heart: c => `<svg class="stk" viewBox="0 0 44 44"><path d="M22 37S6 27.5 6 16.5C6 11 10 7.5 14.6 7.5c3.2 0 5.8 1.8 7.4 4.4 1.6-2.6 4.2-4.4 7.4-4.4C34 7.5 38 11 38 16.5 38 27.5 22 37 22 37Z" fill="#fff" stroke="#fff" stroke-width="5" stroke-linejoin="round"/><path d="M22 37S6 27.5 6 16.5C6 11 10 7.5 14.6 7.5c3.2 0 5.8 1.8 7.4 4.4 1.6-2.6 4.2-4.4 7.4-4.4C34 7.5 38 11 38 16.5 38 27.5 22 37 22 37Z" fill="${c}"/><path d="M11.5 14.5c.6-2 2-3.2 3.8-3.5" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".7" fill="none"/></svg>`,
+  sun: c => `<svg class="stk" viewBox="0 0 44 44"><g stroke="#fff" stroke-width="5" stroke-linecap="round"><circle cx="22" cy="22" r="10" fill="#fff"/><path d="M22 4v5M22 35v5M4 22h5M35 22h5M9.3 9.3l3.5 3.5M31.2 31.2l3.5 3.5M9.3 34.7l3.5-3.5M31.2 12.8l3.5-3.5"/></g><g stroke="${c}" stroke-width="3" stroke-linecap="round"><path d="M22 4v5M22 35v5M4 22h5M35 22h5M9.3 9.3l3.5 3.5M31.2 31.2l3.5 3.5M9.3 34.7l3.5-3.5M31.2 12.8l3.5-3.5"/></g><circle cx="22" cy="22" r="9" fill="${c}"/><circle cx="18.6" cy="21" r="1.3" fill="#1C2554"/><circle cx="25.4" cy="21" r="1.3" fill="#1C2554"/><path d="M19 25c1.8 1.4 4.2 1.4 6 0" stroke="#1C2554" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`
+};
+const GOAL_STICKER = { body: ['star', '#FFC43A'], food: ['heart', '#FF6FA3'], out: ['sun', '#B9F24A'] };
+function beanDoodle(sleepy) {
+  return `<svg viewBox="0 0 80 80" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M40 9.5c17.8-.6 31 13.3 30.6 30.4C70.2 57 57 70.8 39.6 70.6 22.3 70.4 9.3 57.2 9.6 40 9.9 23 22.4 10.1 40 9.5Z"/>
+    <path d="M52 16c4 6 5 14 2.5 21M57.5 22c1.5 3 2 6 1.6 9" opacity=".55"/>
+    <circle cx="25" cy="27" r="3.2" opacity=".5"/><circle cx="57" cy="52" r="4" opacity=".5"/><circle cx="20" cy="54" r="2.2" opacity=".5"/>
+    ${sleepy
+      ? `<path d="M28 41c2.4 2 5.6 2 8 0M45 41c2.4 2 5.6 2 8 0"/><path d="M36 51c2.6 1.4 5.6 1.4 8 0"/><path d="M62 8h7l-7 7h7M70 1h4l-4 4h4" stroke-width="1.8"/>`
+      : `<circle cx="32" cy="40" r="2.6" fill="currentColor" stroke="none"/><circle cx="49" cy="40" r="2.6" fill="currentColor" stroke="none"/><path d="M34.5 49c3.4 3 8.6 3 12 0"/><path d="M25 46.5c-1.6.4-3 .3-4.4-.2M56 46.3c1.6.4 3 .3 4.4-.2" stroke="#FF6FAE"/>`}
+  </svg>`;
+}
+function squiggle(w) {
+  let d = 'M2 6'; for (let x = 2; x < w; x += 12) d += ` q3 -5 6 0 t6 0`;
+  return `<svg viewBox="0 0 ${w} 10" preserveAspectRatio="none" aria-hidden="true"><path d="${d}" stroke="var(--rule)" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`;
+}
+function renderPlanner(el) {
+  const M = MODES[mode];
+  el.innerHTML = `
+    <div class="margin-rule"></div><div class="strap"></div>
+    <div class="scroll"><div class="page">
+      ${statusBar(M.clock)}
+      <div class="head">
+        <h2 class="dayname">Monday</h2>
+        <button class="bean" type="button" aria-label="Poke Bean">${beanDoodle(mode === 'night')}</button>
+        <p class="date">19 October</p>
+      </div>
+      <p class="bean-says" aria-live="polite"><span class="who">Bean:</span> <span class="line"></span></p>
+
+      <div class="note">
+        <span class="washi" aria-hidden="true"></span>
+        ${M.timer ? `
+          <div class="note-top"><h3>Website build</h3><span class="since">since 09:00</span></div>
+          <div class="note-row"><span class="clock" data-clock>${fmt(timerBase)}</span>
+            <button class="penbtn" type="button" data-toggle-timer><i class="ph-bold ph-stop"></i>Stop</button></div>`
+        : `
+          <div class="note-top"><h3>Tomorrow, 15:00</h3><span class="since">Tue 20</span></div>
+          <div class="note-row"><span class="clock" style="font-size:30px">Dentist</span>
+            <button class="penbtn" type="button" data-toggle-timer><i class="ph-bold ph-play"></i>Timer</button></div>
+          <p class="tomorrow-line">Logged today: 5h 12m on Website build</p>`}
+      </div>
+
+      <h4>Today ${squiggle(78)}</h4>
+      <ol class="sched">
+        ${SCHEDULE.map((s, i) => `<li class="${i < M.pastUntil ? 'past' : ''} ${i === M.nextIdx ? 'next' : ''}">
+          <time>${s.t}</time><div class="t"><span>${esc(s.title)}</span><span class="s">${esc(s.sub)}</span></div></li>`).join('')}
+      </ol>
+
+      <h4>To do ${squiggle(70)}</h4>
+      <ul class="tasks">
+        ${TASKS.map((t, i) => `<li class="task ${t.done ? 'done' : ''} ${t.flagged ? 'flagged' : ''}" role="checkbox" tabindex="0" aria-checked="${t.done}" data-i="${i}">
+          <span class="box">${PEN_BOX}${STICKERS.star('#FFC43A')}</span>
+          <span><span class="label">${esc(t.title)}</span>${t.from ? `<span class="from">${t.from}</span>` : ''}</span></li>`).join('')}
+      </ul>
+
+      <h4>This week ${squiggle(108)}</h4>
+      <ul class="chart">
+        ${GOALS.map((g, gi) => `<li><span class="g">${g.title}<small>${g.n} of ${g.of}</small></span><span class="slots">
+          ${Array.from({ length: g.of }, (_, k) => `<button type="button" class="slot ${k < g.n ? 'on' : ''}" data-g="${gi}" data-k="${k}" aria-label="${g.title} ${k + 1}">
+            <svg class="ring" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="3 3.4" opacity=".45"><circle cx="14" cy="14" r="12"/></svg>
+            ${STICKERS[GOAL_STICKER[g.area][0]](GOAL_STICKER[g.area][1])}</button>`).join('')}
+        </span></li>`).join('')}
+      </ul>
+    </div></div>
+
+    <div class="quick"><label><i class="ph ph-pencil-simple-line" aria-hidden="true"></i><span class="sr">Add anything</span><input type="text" placeholder="Jot it down… ‘gym fri 6pm’"></label></div>
+    <nav class="tabs" aria-label="Sections">
+      <button class="tab" type="button" aria-current="page"><i class="ph-bold ph-sun-horizon"></i>Today</button>
+      <button class="tab" type="button" style="background:#9ED8FF"><i class="ph-bold ph-calendar-blank"></i>Week</button>
+      <button class="tab" type="button" style="background:#FFB25E"><i class="ph-bold ph-timer"></i>Timer</button>
+      <button class="tab" type="button" style="background:#C6F06A"><i class="ph-bold ph-cooking-pot"></i>Meals</button>
+      <button class="tab" type="button" style="background:#FF9CC8"><i class="ph-bold ph-heart"></i>Me</button>
+    </nav>`;
+
+  wireBean(el, '.bean', '.bean-says .line', 'stamp', (lineEl, txt) => typeOn(lineEl, txt, 14));
+  el.querySelectorAll('.task').forEach(row => {
+    const act = () => {
+      const on = !row.classList.contains('done');
+      row.classList.toggle('done', on);
+      row.classList.remove('flagged');
+      row.setAttribute('aria-checked', on);
+      if (on) blip('stamp');
+    };
+    row.addEventListener('click', act);
+    row.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); act(); } });
+  });
+  el.querySelectorAll('.slot').forEach(b => b.addEventListener('click', () => {
+    const on = !b.classList.contains('on');
+    b.classList.toggle('on', on);
+    const row = b.closest('li'), n = row.querySelectorAll('.slot.on').length, of = row.querySelectorAll('.slot').length;
+    row.querySelector('small').textContent = `${n} of ${of}`;
+    if (on) blip('stamp');
+  }));
+  wireTimer(el, 'planner', running => {
+    const btn = el.querySelector('[data-toggle-timer]');
+    if (mode === 'day') btn.innerHTML = running ? '<i class="ph-bold ph-stop"></i>Stop' : '<i class="ph-bold ph-play"></i>Start';
+  });
+}
+
+/* ═════════ B · Cosy Quest ═════════ */
+function beanChunky(sleepy) {
+  return `<svg viewBox="0 0 100 100" aria-hidden="true">
+    <ellipse cx="50" cy="92" rx="26" ry="5" fill="#000" opacity=".12"/>
+    <circle cx="50" cy="50" r="38" fill="#FFE07A" stroke="#3A3156" stroke-width="4"/>
+    <path d="M72 26c7 9 9 21 5 32" stroke="#F2C24A" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <circle cx="30" cy="30" r="5" fill="#F2C24A"/><circle cx="68" cy="66" r="6.5" fill="#F2C24A"/><circle cx="26" cy="64" r="3.5" fill="#F2C24A"/>
+    ${sleepy
+      ? `<path d="M34 50c3 3 7 3 10 0M56 50c3 3 7 3 10 0" stroke="#3A3156" stroke-width="3.6" fill="none" stroke-linecap="round"/>
+         <path d="M78 10h9l-9 9h9" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`
+      : `<ellipse cx="39" cy="49" rx="4.6" ry="6" fill="#3A3156"/><ellipse cx="61" cy="49" rx="4.6" ry="6" fill="#3A3156"/>
+         <circle cx="40.6" cy="46.6" r="1.7" fill="#fff"/><circle cx="62.6" cy="46.6" r="1.7" fill="#fff"/>`}
+    <ellipse cx="29" cy="59" rx="6" ry="3.6" fill="#FF9BB8" opacity=".85"/><ellipse cx="71" cy="59" rx="6" ry="3.6" fill="#FF9BB8" opacity=".85"/>
+    <path d="M45 61c3 3 7 3 10 0" stroke="#3A3156" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+  </svg>`;
+}
+const QUEST_AREA = { work: 'var(--teal)', food: 'var(--peach)', body: 'var(--lilac)', out: 'var(--rose)' };
+let stardust = 128;
+function renderQuest(el) {
+  const M = MODES[mode];
+  const stars = Array.from({ length: 34 }, (_, i) => `<i style="left:${(i * 47) % 380 + 5}px;top:${(i * 83) % 520 + 30}px;animation-delay:${(i % 7) * .4}s;${i % 4 ? '' : 'width:4px;height:4px;'}"></i>`).join('');
+  el.innerHTML = `
+    <div class="stars" aria-hidden="true">${stars}</div>
+    <svg class="cloud" style="top:120px" width="120" height="44" viewBox="0 0 120 44" aria-hidden="true"><path d="M18 42h86a16 16 0 0 0 0-32 22 22 0 0 0-40-6A18 18 0 0 0 30 18 12 12 0 0 0 18 42Z"/></svg>
+    <svg class="cloud c2" style="top:430px" width="90" height="34" viewBox="0 0 120 44" aria-hidden="true"><path d="M18 42h86a16 16 0 0 0 0-32 22 22 0 0 0-40-6A18 18 0 0 0 30 18 12 12 0 0 0 18 42Z"/></svg>
+    <div class="scroll"><div class="page">
+      ${statusBar(M.clock)}
+      <div class="hud">
+        <span class="pill"><i class="ph-fill ph-calendar-heart cal"></i>Mon 19 Oct <span class="sub">${M.clock}</span></span>
+        <span class="pill" aria-label="Stardust"><i class="ph-fill ph-star-four star"></i><span class="dust">${stardust}</span></span>
+      </div>
+
+      <div class="talk">
+        <button class="bean" type="button" aria-label="Talk to Bean">${beanChunky(mode === 'night')}</button>
+        <div class="bubble" aria-live="polite"><span class="name">Bean</span><span class="line"></span><i class="ph-fill ph-caret-down more" aria-hidden="true"></i></div>
+      </div>
+
+      <section class="panel">
+        ${M.timer ? `
+        <div class="activity">
+          <span class="tile" style="background:var(--teal)"><i class="ph-fill ph-laptop"></i></span>
+          <span class="what"><b>Website build</b><span>Working since 09:00</span></span>
+          <span class="clock" data-clock>${fmt(timerBase)}</span>
+          <span class="bar" aria-hidden="true"><span></span></span>
+          <div class="act-foot"><span>3h focus goal</span><button class="chunky" type="button" data-toggle-timer><i class="ph-fill ph-stop"></i>Stop</button></div>
+        </div>` : `
+        <div class="activity">
+          <span class="tile" style="background:var(--lilac)"><i class="ph-fill ph-tooth"></i></span>
+          <span class="what"><b>Dentist</b><span>Tomorrow at 15:00</span></span>
+          <span class="clock" style="font-size:18px">5h 12m</span>
+          <div class="act-foot"><span>Worked today on Website build</span><button class="chunky go" type="button" data-toggle-timer><i class="ph-fill ph-play"></i>Start</button></div>
+        </div>`}
+      </section>
+
+      <section class="panel">
+        <h3><i class="ph-fill ph-sun-horizon" style="color:var(--sun)"></i>Today</h3>
+        <ol class="rows">
+          ${SCHEDULE.map((s, i) => `<li class="${i < M.pastUntil ? 'past' : ''} ${i === M.nextIdx ? 'next' : ''}">
+            <span class="tile" style="background:${QUEST_AREA[s.area]}"><i class="ph-fill ${AREA_ICON[s.area]}"></i></span>
+            <span class="txt"><b>${esc(s.title)}</b><span>${esc(s.sub)}</span></span><time>${s.t}</time></li>`).join('')}
+        </ol>
+      </section>
+
+      <section class="panel">
+        <h3><i class="ph-fill ph-scroll" style="color:var(--peach)"></i>Quests</h3>
+        <ul class="rows">
+          ${TASKS.map((t, i) => `<li class="quest ${t.done ? 'done' : ''} ${t.flagged ? 'flagged' : ''}" role="checkbox" tabindex="0" aria-checked="${t.done}">
+            <span class="check"><i class="ph-bold ph-check"></i></span>
+            <span class="txt"><b>${esc(t.title)}${t.flagged ? '<span class="new">again</span>' : ''}</b>${t.from ? `<span>${t.from}</span>` : ''}</span></li>`).join('')}
+        </ul>
+      </section>
+
+      <section class="panel">
+        <h3><i class="ph-fill ph-flag-banner" style="color:var(--leaf)"></i>This week</h3>
+        <ul class="goals">
+          ${GOALS.map(g => `<li role="button" tabindex="0" style="--c:${QUEST_AREA[g.area]}">
+            <span class="tile" style="background:${QUEST_AREA[g.area]}"><i class="ph-fill ${AREA_ICON[g.area]}"></i></span>
+            <b>${g.title}</b><span class="count">${g.n}/${g.of}</span>
+            <span class="segs">${Array.from({ length: g.of }, (_, k) => `<span class="${k < g.n ? 'on' : ''}"></span>`).join('')}</span></li>`).join('')}
+        </ul>
+      </section>
+    </div></div>
+
+    <label class="quick"><span class="sr">Add anything</span><input type="text" placeholder="Add anything… ‘gym fri 6pm’"><button type="button" aria-label="Add"><i class="ph-bold ph-plus"></i></button></label>
+    <nav class="dock" aria-label="Sections">
+      <button type="button" aria-current="page"><i class="ph-fill ph-house-simple"></i>Today</button>
+      <button type="button"><i class="ph-fill ph-calendar-blank"></i>Week</button>
+      <button type="button"><i class="ph-fill ph-timer"></i>Timer</button>
+      <button type="button"><i class="ph-fill ph-cooking-pot"></i>Meals</button>
+      <button type="button"><i class="ph-fill ph-smiley"></i>Me</button>
+    </nav>`;
+
+  wireBean(el, '.bean', '.bubble .line', 'pop', (lineEl, txt) => typeOn(lineEl, txt, 22));
+  const dust = el.querySelector('.dust');
+  el.querySelectorAll('.quest').forEach(row => {
+    const act = () => {
+      const on = !row.classList.contains('done');
+      row.classList.toggle('done', on);
+      row.classList.remove('flagged');
+      const tag = row.querySelector('.new'); if (tag && on) tag.remove();
+      row.setAttribute('aria-checked', on);
+      if (on) {
+        blip('chime');
+        stardust += 5; dust.textContent = stardust;
+        dust.classList.remove('bump'); void dust.offsetWidth; dust.classList.add('bump');
+        if (!reduce) {
+          const r = document.createElement('span'); r.className = 'reward'; r.innerHTML = '<i class="ph-fill ph-star-four"></i>+5';
+          row.appendChild(r); setTimeout(() => r.remove(), 1000);
+          for (let k = 0; k < 6; k++) {
+            const s = document.createElement('i'); s.className = 'spark ph-fill ph-star-four';
+            const a = (k / 6) * Math.PI * 2; s.style.left = '14px'; s.style.top = '18px';
+            s.style.setProperty('--dx', `${Math.cos(a) * 30}px`); s.style.setProperty('--dy', `${Math.sin(a) * 30}px`);
+            row.appendChild(s); setTimeout(() => s.remove(), 650);
+          }
+        }
+      } else { stardust -= 5; dust.textContent = stardust; }
+    };
+    row.addEventListener('click', act);
+    row.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); act(); } });
+  });
+  el.querySelectorAll('.goals li').forEach(li => {
+    const act = () => {
+      const segs = [...li.querySelectorAll('.segs span')];
+      let n = segs.filter(s => s.classList.contains('on')).length;
+      n = n >= segs.length ? 0 : n + 1;
+      segs.forEach((s, k) => s.classList.toggle('on', k < n));
+      li.querySelector('.count').textContent = `${n}/${segs.length}`;
+      if (n) blip('chime');
+    };
+    li.addEventListener('click', act);
+    li.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); act(); } });
+  });
+  wireTimer(el, 'quest', running => {
+    const btn = el.querySelector('[data-toggle-timer]');
+    if (mode === 'day') { btn.classList.toggle('go', !running); btn.innerHTML = running ? '<i class="ph-fill ph-stop"></i>Stop' : '<i class="ph-fill ph-play"></i>Resume'; }
+  });
+}
+
+/* ═════════ C · Island Map ═════════ */
+const ISLE_PATHS = [
+  'M50 6C74 3 96 20 96 44c0 25-16 50-44 51C25 96 4 79 4 52 4 27 25 9 50 6Z',
+  'M45 5c26-4 52 15 50 42-2 26-18 48-47 47C19 93 2 72 6 45 9 22 22 9 45 5Z',
+  'M55 4c26 4 45 26 39 53-6 26-31 41-55 35C14 86 1 62 7 38 13 14 31 0 55 4Z'
+];
+const ISLE_COLOR = { body: 'var(--coral)', food: 'var(--yellow)', out: 'var(--blue)' };
+function beanFlat(sleepy) {
+  return `<svg viewBox="0 0 100 100" aria-hidden="true">
+    <circle cx="50" cy="52" r="40" fill="#EBC1FF"/>
+    <path d="M50 12a40 40 0 0 1 0 80 30 40 0 0 0 0-80Z" fill="#D9A3F7"/>
+    ${sleepy
+      ? `<path d="M33 50q5 5 10 0M57 50q5 5 10 0" stroke="#2C2E2A" stroke-width="4" fill="none" stroke-linecap="round"/>`
+      : `<circle cx="38" cy="48" r="4.5" fill="#2C2E2A"/><circle cx="62" cy="48" r="4.5" fill="#2C2E2A"/>`}
+    <path d="M42 62q8 7 16 0" stroke="#2C2E2A" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <circle cx="28" cy="60" r="5" fill="#FF705D" opacity=".55"/><circle cx="72" cy="60" r="5" fill="#FF705D" opacity=".55"/>
+  </svg>`;
+}
+function renderMap(el) {
+  const M = MODES[mode];
+  el.innerHTML = `
+    <div class="scroll">
+      <div class="coast">
+        <svg class="land" viewBox="0 0 390 372" aria-hidden="true"><path fill-rule="evenodd" d="M-20-20H410V262c-22 40-62 62-108 54-40-7-56 34-104 40-52 7-70-28-112-22-40 5-68 26-106 14Z"/></svg>
+        ${statusBar(M.clock)}
+        <div class="coast-inner">
+          <h2 class="big">Monday</h2>
+          <p class="when">19 October · ${M.greet === 'Night' ? 'bedtime' : 'morning'}</p>
+          <p class="bean-line" aria-live="polite"></p>
+        </div>
+        <button class="bean" type="button" aria-label="Poke Bean">${beanFlat(mode === 'night')}</button>
+      </div>
+      <div class="sea">
+        ${M.timer ? `
+        <button class="cap now live" type="button" data-toggle-timer aria-pressed="true">
+          <span class="chip"><i class="ph-bold ph-pause"></i></span>
+          <span class="cap-txt"><b>Website build</b><span class="clock" data-clock>${fmt(timerBase)}</span></span>
+        </button>` : `
+        <button class="cap now" type="button" data-toggle-timer aria-pressed="false">
+          <span class="chip"><i class="ph-bold ph-play"></i></span>
+          <span class="cap-txt"><b>5h 12m on Website build today</b><span class="clock" style="font-size:20px">Tomorrow 15:00 · Dentist</span></span>
+        </button>`}
+
+        <h3>Today</h3>
+        <ol class="events">
+          ${SCHEDULE.map((s, i) => `<li class="${i < M.pastUntil ? 'past' : ''}">
+            <time>${s.t}</time><span class="t">${esc(s.title)}<span>${esc(s.sub)}</span></span>
+            <span class="lbl ${{ work: 'green', food: 'lilac', body: 'coral', out: 'blue' }[s.area]}">${{ work: 'Work', food: 'Food', body: 'Gym', out: 'Out' }[s.area]}</span></li>`).join('')}
+        </ol>
+
+        <h3>To do</h3>
+        <ul class="todo">
+          ${TASKS.map(t => `<li><button type="button" class="cap ${t.done ? 'live' : ''} ${t.flagged ? 'flagged' : ''}" aria-pressed="${t.done}">
+            <span class="chip"><i class="ph-bold ph-check"></i></span>
+            <span class="cap-txt">${esc(t.title)}${t.from ? `<span class="from">${t.from}</span>` : ''}</span></button></li>`).join('')}
+        </ul>
+
+        <h3>This week</h3>
+        <div class="islands">
+          ${GOALS.map((g, gi) => `<button type="button" class="isle ${g.n >= g.of ? 'full' : ''}" data-n="${g.n}" data-of="${g.of}" aria-label="${g.title}: ${g.n} of ${g.of}">
+            <svg viewBox="0 0 100 100"><path d="${ISLE_PATHS[gi]}" fill="${ISLE_COLOR[g.area]}" style="transform:scale(${.72 + .28 * g.n / g.of})"/></svg>
+            <span class="it"><b>${g.title}</b><span>${g.n}/${g.of}</span></span></button>`).join('')}
+        </div>
+      </div>
+    </div>
+    <label class="quick"><span class="sr">Add anything</span><input type="text" placeholder="Add anything… ‘gym fri 6pm’"><button type="button" aria-label="Add"><i class="ph-bold ph-plus"></i></button></label>
+    <nav class="navcaps" aria-label="Sections">
+      <button type="button" aria-current="page"><i class="ph-fill ph-island"></i>Today</button>
+      <button type="button"><i class="ph ph-calendar-blank"></i>Week</button>
+      <button type="button"><i class="ph ph-timer"></i>Timer</button>
+      <button type="button"><i class="ph ph-cooking-pot"></i>Meals</button>
+    </nav>`;
+
+  wireBean(el, '.bean', '.bean-line', 'plip', (lineEl, txt) => fadeSwap(lineEl, txt));
+  el.querySelectorAll('.todo .cap').forEach(b => b.addEventListener('click', () => {
+    const on = !b.classList.contains('live');
+    b.classList.toggle('live', on); b.classList.remove('flagged');
+    b.setAttribute('aria-pressed', on);
+    if (on) blip('plip');
+  }));
+  el.querySelectorAll('.isle').forEach(b => b.addEventListener('click', () => {
+    let n = +b.dataset.n; const of = +b.dataset.of;
+    n = n >= of ? 0 : n + 1; b.dataset.n = n;
+    b.querySelector('path').style.transform = `scale(${.72 + .28 * n / of})`;
+    b.querySelector('.it span').textContent = `${n}/${of}`;
+    b.classList.toggle('full', n >= of);
+    b.setAttribute('aria-label', `${b.querySelector('b').textContent}: ${n} of ${of}`);
+    if (n) blip('plip');
+  }));
+  wireTimer(el, 'map', running => {
+    const b = el.querySelector('[data-toggle-timer]');
+    if (mode !== 'day') return;
+    b.classList.toggle('live', running); b.setAttribute('aria-pressed', running);
+    b.querySelector('.chip i').className = running ? 'ph-bold ph-pause' : 'ph-bold ph-play';
+  });
+}
+
+/* ─────────── shared behaviours ─────────── */
+function typeOn(el, txt, speed) {
+  clearInterval(el._t);
+  if (reduce) { el.textContent = txt; return; }
+  let i = 0; el.textContent = '';
+  el._t = setInterval(() => { el.textContent = txt.slice(0, ++i); if (i >= txt.length) clearInterval(el._t); }, speed);
+}
+function fadeSwap(el, txt) {
+  if (reduce) { el.textContent = txt; return; }
+  el.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-6px)' }], { duration: 160, easing: 'ease-in' }).onfinish = () => {
+    el.textContent = txt;
+    el.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 360, easing: 'cubic-bezier(.3,1.5,.5,1)' });
+  };
+}
+function wireBean(el, btnSel, lineSel, sound, show) {
+  const lines = MODES[mode].lines; let k = 0;
+  const lineEl = el.querySelector(lineSel);
+  show(lineEl, lines[0]);
+  el.querySelector(btnSel).addEventListener('click', () => { k = (k + 1) % lines.length; show(lineEl, lines[k]); blip(sound); });
+}
+function wireTimer(el, key, onChange) {
+  const btn = el.querySelector('[data-toggle-timer]');
+  timers[key] = mode === 'day';
+  btn.addEventListener('click', () => {
+    if (mode !== 'day') { blip('pop'); return; }
+    timers[key] = !timers[key]; onChange(timers[key]); blip('pop');
+  });
+}
+setInterval(() => {
+  if (mode !== 'day') return;
+  timerBase++;
+  ['planner', 'quest', 'map'].forEach(k => {
+    if (!timers[k]) return;
+    const c = document.querySelector(`#${k} [data-clock]`); if (c) c.textContent = fmt(timerBase);
+  });
+}, 1000);
+
+function renderAll() {
+  renderPlanner(document.getElementById('planner'));
+  renderQuest(document.getElementById('quest'));
+  renderMap(document.getElementById('map'));
+}
+
+/* ─────────── shell controls ─────────── */
+document.querySelectorAll('[data-mode-btn]').forEach(b => b.addEventListener('click', () => {
+  mode = b.dataset.modeBtn;
+  document.body.dataset.mode = mode;
+  document.querySelectorAll('[data-mode-btn]').forEach(x => x.setAttribute('aria-pressed', x === b));
+  renderAll();
+}));
+document.getElementById('soundBtn').addEventListener('click', e => {
+  soundOn = !soundOn;
+  const b = e.currentTarget; b.setAttribute('aria-pressed', soundOn);
+  b.innerHTML = soundOn ? '<i class="ph ph-speaker-simple-high"></i>Sound' : '<i class="ph ph-speaker-simple-slash"></i>Muted';
+});
+document.querySelectorAll('[data-show]').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('[data-show]').forEach(x => x.setAttribute('aria-pressed', x === b));
+  document.querySelectorAll('.option').forEach(o => o.classList.toggle('is-shown', o.id === 'opt-' + b.dataset.show));
+}));
+function fitPhones() {
+  const vw = document.documentElement.clientWidth;
+  const avail = vw >= 1280 ? Math.min((vw - 48 - 64) / 3, 410) : Math.min(vw - 32, 410);
+  const z = Math.min(1, avail / 410);
+  document.querySelectorAll('.phone').forEach(p => p.style.setProperty('--z', z.toFixed(3)));
+}
+addEventListener('resize', fitPhones);
+fitPhones();
+renderAll();
+</script>
+</body>
+</html>

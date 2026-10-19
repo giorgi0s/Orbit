@@ -1,0 +1,27 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "orbit",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "node_modules/vite/bin/vite.js",
+        "--port",
+        "5173",
+        "--strictPort",
+        "--host",
+        "127.0.0.1"
+      ],
+      "port": 5173
+    },
+    {
+      "name": "mockups",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "-e",
+        "const h=require('http'),f=require('fs'),p=require('path');const d='/Users/giorgio/Documents/Personal/Orbit/mockups';h.createServer((q,r)=>{const u=decodeURIComponent(q.url.split('?')[0]);const fp=p.join(d,u==='/'?'today-vibes.html':u);if(!fp.startsWith(d))return r.writeHead(403).end();f.readFile(fp,(e,b)=>{if(e)return r.writeHead(404).end('not found');r.writeHead(200,{'content-type':fp.endsWith('.html')?'text/html; charset=utf-8':'application/octet-stream','cache-control':'no-store'}).end(b)})}).listen(+process.env.PORT||4173,'127.0.0.1')"
+      ],
+      "port": 4173
+    }
+  ]
+}
