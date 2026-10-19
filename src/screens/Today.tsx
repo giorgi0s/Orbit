@@ -1,22 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AnimatePresence } from 'motion/react'
 import { Play, Stop } from '@phosphor-icons/react'
 import { Bean, PenBox, Squiggle } from '../components/Doodles'
-import { Sticker, type StickerKind } from '../components/Sticker'
-import { useStored } from '../lib/storage'
+import { Sticker } from '../components/Sticker'
+import { useGoals, useTimer, type Goal, type useTasks } from '../lib/data'
 import { clock, duration, isBedtime, useNow, weekKey } from '../lib/time'
 import { play, tap } from '../lib/feel'
-
-export type Task = { id: string; title: string; done: boolean; createdAt: number }
-type Goal = { id: string; title: string; target: number; sticker: StickerKind }
-type TimerState = { project: string; startedAt: number | null }
-type TimeEntry = { project: string; start: number; end: number }
-
-const GOALS: Goal[] = [
-  { id: 'gym', title: 'Gym', target: 3, sticker: 'star' },
-  { id: 'cook', title: 'Cook at home', target: 4, sticker: 'heart' },
-  { id: 'out', title: 'Go out', target: 2, sticker: 'sun' },
-]
 
 function beanLines(now: Date, left: number): string[] {
   const things = left === 0 ? 'Nothing left on the list' : left === 1 ? 'One thing left on the list' : `${left} things left on the list`
@@ -35,46 +24,47 @@ function beanLines(now: Date, left: number): string[] {
   ]
 }
 
-export function Today({ tasks, setTasks }: { tasks: Task[]; setTasks: (fn: (t: Task[]) => Task[]) => void }) {
+export function Today({ userId, tasks: taskList }: { userId: string; tasks: ReturnType<typeof useTasks> }) {
   const now = useNow()
   const bedtime = isBedtime(now)
+  const { tasks } = taskList
   const left = tasks.filter(t => !t.done).length
   const lines = beanLines(now, left)
   const [lineIdx, setLineIdx] = useState(0)
 
-  const [timer, setTimer] = useStored<TimerState>('timer', { project: 'Work', startedAt: null })
-  const [entries, setEntries] = useStored<TimeEntry[]>('time-entries', [])
-  const [progress, setProgress] = useStored<Record<string, Record<string, number>>>('goal-progress', {})
   const week = weekKey(now)
-  const thisWeek = progress[week] ?? {}
-
   const todayStart = new Date(now).setHours(0, 0, 0, 0)
-  const loggedToday = entries
-    .filter(e => e.end >= todayStart)
-    .reduce((sum, e) => sum + (e.end - Math.max(e.start, todayStart)) / 1000, 0)
-  const lastEntry = entries.at(-1)
+  const timer = useTimer(userId, new Date(todayStart).toISOString())
+  const goals = useGoals(week)
+
+  // The project name is edited locally and saved when you leave the field,
+  // so a sync from the other device can't overwrite half-typed text.
+  const [projectDraft, setProjectDraft] = useState(timer.project)
+  useEffect(() => setProjectDraft(timer.project), [timer.project])
+
+  const loggedToday = timer.entries.reduce((sum, e) => {
+    const start = Math.max(new Date(e.started_at).getTime(), todayStart)
+    return sum + Math.max(0, new Date(e.ended_at).getTime() - start) / 1000
+  }, 0)
+  const lastEntry = timer.entries.at(-1)
 
   function toggleTimer() {
     tap()
     play('pop')
-    if (timer.startedAt) {
-      setEntries(list => [...list, { project: timer.project || 'Work', start: timer.startedAt!, end: Date.now() }])
-      setTimer(t => ({ ...t, startedAt: null }))
-    } else {
-      setTimer(t => ({ ...t, startedAt: Date.now() }))
-    }
+    if (timer.startedAt) timer.stop()
+    else timer.start()
   }
 
   function toggleTask(id: string) {
     if (tasks.find(t => t.id === id)?.done === false) { play('stamp'); tap() }
-    setTasks(list => list.map(t => (t.id === id ? { ...t, done: !t.done } : t)))
+    taskList.toggle(id)
   }
 
   function stamp(goal: Goal, slot: number) {
-    const n = thisWeek[goal.id] ?? 0
+    const n = goals.count(goal.id)
     const next = slot < n ? slot : slot + 1 // tap a filled slot to peel back to it
     if (next > n) { play('stamp'); tap() }
-    setProgress(p => ({ ...p, [week]: { ...(p[week] ?? {}), [goal.id]: Math.min(next, goal.target) } }))
+    goals.setCount(goal.id, Math.min(next, goal.target))
   }
 
   const running = timer.startedAt != null
@@ -103,8 +93,10 @@ export function Today({ tasks, setTasks }: { tasks: Task[]; setTasks: (fn: (t: T
         <div className="note-top">
           <input
             className="note-project"
-            value={timer.project}
-            onChange={e => setTimer(t => ({ ...t, project: e.target.value }))}
+            value={projectDraft}
+            onChange={e => setProjectDraft(e.target.value)}
+            onBlur={() => { const p = projectDraft.trim() || 'Work'; setProjectDraft(p); if (p !== timer.project) timer.rename(p) }}
+            onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur() }}
             aria-label="What are you working on?"
             placeholder="What are you working on?"
             disabled={running}
@@ -114,7 +106,7 @@ export function Today({ tasks, setTasks }: { tasks: Task[]; setTasks: (fn: (t: T
           )}
         </div>
         <div className="note-row">
-          <span className="note-clock">{clock(running ? (now.getTime() - timer.startedAt!) / 1000 : 0)}</span>
+          <span className="note-clock">{clock(running ? Math.max(0, now.getTime() - timer.startedAt!) / 1000 : 0)}</span>
           <button className="pen-btn" type="button" onClick={toggleTimer}>
             {running ? <><Stop weight="bold" />Stop</> : <><Play weight="bold" />Start</>}
           </button>
@@ -152,15 +144,18 @@ export function Today({ tasks, setTasks }: { tasks: Task[]; setTasks: (fn: (t: T
         </ul>
       )}
       {doneCount > 0 && (
-        <button className="tidy" type="button" onClick={() => setTasks(list => list.filter(t => !t.done))}>
+        <button className="tidy" type="button" onClick={() => taskList.tidy()}>
           Tidy away {doneCount} ticked {doneCount === 1 ? 'thing' : 'things'}
         </button>
       )}
 
       <h2 className="page-h">This week <Squiggle width={108} /></h2>
+      {goals.ready && goals.goals.length === 0 && (
+        <p className="empty">No weekly goals yet. They arrive with the Sunday reset in Phase 5.</p>
+      )}
       <ul className="chart">
-        {GOALS.map(g => {
-          const n = thisWeek[g.id] ?? 0
+        {goals.goals.map(g => {
+          const n = goals.count(g.id)
           return (
             <li key={g.id}>
               <span className="goal">{g.title}<small>{n} of {g.target}</small></span>

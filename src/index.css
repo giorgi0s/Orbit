@@ -310,3 +310,13 @@ button { cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; transition-delay: 0s !important; }
 }
+
+.sync-note {
+  position: relative; z-index: 21; flex: none;
+  margin: 0 var(--gutter-r) 6px calc(var(--margin) + 14px);
+  padding: 6px 10px;
+  background: var(--hl-pink);
+  border-radius: 6px 10px 5px 12px;
+  font-size: 14px;
+  font-variation-settings: "INFM" 80, "BNCE" 15;
+}

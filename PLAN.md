@@ -150,7 +150,7 @@ A guided 5–10 minute ritual, with a Sunday 18:00 notification to start it:
 
 ## 4. Data model (Supabase tables)
 
-Every table has `id`, `user_id`, `created_at`. Row Level Security on everything (only I can read my rows).
+Every table has `user_id` and Row Level Security (only I can read my rows). ✅ = live in Supabase; SQL lives in `supabase/migrations/`, run by pasting into the SQL Editor. Changes sync between devices instantly via Supabase Realtime.
 
 | Table | Key fields |
 |---|---|
@@ -159,10 +159,12 @@ Every table has `id`, `user_id`, `created_at`. Row Level Security on everything 
 | `events` | title, area_id, start_at, end_at, all_day, location, notes, rrule (repeats), reminder_offsets |
 | `reminders` | event_id / task_id, fire_at, title, body, sent_at |
 | `push_subscriptions` | endpoint, keys, device_label |
-| `tasks` | title, area_id, bucket (weekday/weekend/someday), week_start, due_date, done_at, rolled_over_count |
-| `weekly_goals` | week_start, title, area_id, target_count, progress |
+| `tasks` ✅ | title, done, done_at (later: area_id, bucket weekday/weekend/someday, due_date, rolled_over_count) |
+| `goals` ✅ | slug, title, target, sticker, sort, archived |
+| `goal_stamps` ✅ | goal_id, week_start, count (stickers per goal per week) |
+| `timer` ✅ | one row per person: project, started_at (null = stopped) |
 | `projects` | name, emoji, colour, archived |
-| `time_entries` | project_id, started_at, ended_at (null = running), note |
+| `time_entries` ✅ | project (text for now; project_id in Phase 3), started_at, ended_at |
 | `recipes` | name, servings, prep_minutes, steps, tags |
 | `recipe_ingredients` | recipe_id, name, quantity, unit |
 | `meal_plan` | date, slot (lunch/dinner), recipe_id |
@@ -187,8 +189,8 @@ Each phase ends with something usable on the phone.
 
 | Phase | What | Done when |
 |---|---|---|
-| **0. Skeleton** | Vite + React + Tailwind + PWA, Supabase project + login, deploy to Vercel | "Hello Orbit" opens from the iPhone home screen and the Mac Dock |
-| **1. Core loop** | Today screen, tasks (weekday/weekend/someday), weekly goals, the satisfying tick | I can plan a week and tick things off |
+| **0. Skeleton** ✅ | Vite + React + Tailwind + PWA, Supabase project + login, deploy to Vercel | "Hello Orbit" opens from the iPhone home screen and the Mac Dock |
+| **1. Core loop** 🟡 sync done | Today screen, tasks (weekday/weekend/someday), weekly goals, the satisfying tick | I can plan a week and tick things off |
 | **2. Calendar + reminders** | Week/month view, quick add, repeating events, the full push pipeline | I get a "tomorrow" notification on my phone |
 | **3. Work timer** | Projects, start/stop across devices, edit entries, reports, CSV/copy export | I log a real work day and export it |
 | **4. Meal prep** | Recipes, meal grid, shopping list, fridge tracker | I plan a week of meals and shop from the list |
